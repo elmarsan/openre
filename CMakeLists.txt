@@ -13,6 +13,6 @@ file(GLOB SOURCES "src/*.cpp")
 
 add_library(openre MODULE ${SOURCES})
 
-target_link_libraries(openre PRIVATE winmm)
+target_link_libraries(openre PRIVATE winmm XInput)
 
 set_target_properties(openre PROPERTIES PREFIX "" SUFFIX ".dll")

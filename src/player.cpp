@@ -189,4 +189,20 @@ namespace openre::player
         interop::writeJmp(0x5024D0, set_inventory_item);
         interop::writeJmp(0x502500, set_inventory_item_quantity);
     }
+
+    bool is_aiming()
+    {
+        return (
+            check_flag(FlagGroup::Status, FG_STATUS_PLAYER) && check_flag(FlagGroup::Status, FG_STATUS_GAMEPLAY)
+            && check_flag(FlagGroup::Status, FG_STATUS_ITEM) && check_flag(FlagGroup::Status, FG_STATUS_24)
+            && !check_flag(FlagGroup::Status, FG_STATUS_SCREEN));
+    }
+
+    bool is_picking_up_item()
+    {
+        return (
+            check_flag(FlagGroup::Status, FG_STATUS_PLAYER) && check_flag(FlagGroup::Status, FG_STATUS_GAMEPLAY)
+            && check_flag(FlagGroup::Status, FG_STATUS_ITEM) && !check_flag(FlagGroup::Status, FG_STATUS_24)
+            && !check_flag(FlagGroup::Status, FG_STATUS_SCREEN));
+    }
 }
