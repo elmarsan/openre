@@ -29,6 +29,9 @@ namespace openre::player
     static uint8_t*& byte_98ED39 = *((uint8_t**)0x98ED39);
     static HudInfo& gHudInfo = *((HudInfo*)0x691F60);
 
+    using MoveType = int (*)(void*);
+    static MoveType* gMoveTable = (MoveType*)0x53A7DC;
+
     static const InventoryDef _initialInventoryAda[FULL_INVENTORY_SIZE] = {
         { ITEM_TYPE_HANDGUN_CLAIRE, 13, 0 },
         { ITEM_TYPE_AMMO_HANDGUN, 45, 0 },
@@ -181,6 +184,118 @@ namespace openre::player
         }
     }
 
+    // 0x004DABC0
+    static int pl_neck(int a1, int a2)
+    {
+        using sig = int (*)(PlayerEntity*, int, int);
+        auto p = (sig)0x004DABC0;
+        return p(&gPlayerEntity, a1, a2);
+    }
+
+    // 0x004B3540
+    static int rot_neck(int a1)
+    {
+        using sig = int (*)(PlayerEntity*, int);
+        auto p = (sig)0x004B3540;
+        return p(&gPlayerEntity, a1);
+    }
+
+    // 0x004D71C0
+    static int pl_bow()
+    {
+        using sig = int (*)(PlayerEntity*);
+        auto p = (sig)0x004D71C0;
+        return p(&gPlayerEntity);
+    }
+
+    // 0x004D4850
+    static int g_rot()
+    {
+        using sig = int (*)(PlayerEntity*);
+        auto p = (sig)0x004D4850;
+        return p(&gPlayerEntity);
+    }
+
+    // 0x004D4910
+    static int gat_rot()
+    {
+        using sig = int (*)(PlayerEntity*);
+        auto p = (sig)0x004D4910;
+        return p(&gPlayerEntity);
+    }
+
+    // 0x004D46A0
+    static int mag_down()
+    {
+        using sig = int (*)(PlayerEntity*);
+        auto p = (sig)0x004D46A0;
+        return p(&gPlayerEntity);
+    }
+
+    // 0x004D97B0
+    static void player_move(PlayerEntity* player)
+    {
+        if (gGameTable.fg_stop < 0)
+        {
+            return;
+        }
+        gGameTable.word_989EEE = (gGameTable.word_989EEE & 0xFF00) | 0xE0;
+        gGameTable.fg_status &= ~0x80;
+        if (!(player->damage_cnt & 0x7F))
+        {
+            player->damage_cnt--;
+        }
+       
+        if (player->id == 13)
+        {
+            auto v3 = static_cast<uint8_t>((player->life << 15) / (player->max_life) >> 8);
+            auto sinParts = reinterpret_cast<uint8_t*>(&(player->pSin_parts_ptr));
+            sinParts[28] = ((v3 | (v3 << 8)) << 8) + 128;
+            if (player->life < 0)
+            {
+                sinParts[28] = 128;
+            }
+            if (gPoisonStatus)
+            {
+                if (!(player->move_cnt & 1))
+                {
+                    gGameTable.dword_689BDC++;
+                }
+                gGameTable.dword_689BDC = (gGameTable.dword_689BDC & 0xFFFFFF) | 64;
+            }
+            else
+            {
+                if (!(gGameTable.dword_689BDC << 24) && !(player->move_cnt & 1))
+                {
+                    gGameTable.dword_689BDC--;
+                }
+            }
+            sinParts[28] += gGameTable.dword_689BDC << 16;
+        }
+
+        if (gPoisonStatus)
+        {
+            if (gPoisonTimer-- == 0)
+            {
+                gPoisonTimer = 30;
+                if (player->life > 1)
+                {
+                    player->life--;
+                }
+            }
+        }
+        gMoveTable[player->routine_0](player);
+        pl_neck(0x1B58u, 1500);
+        rot_neck(player->cdir.y);
+        if ((player->type & 0xFFF) == 12)
+        {
+            pl_bow();
+        }
+        g_rot();
+        gat_rot();
+        mag_down();
+    }
+
     void player_init_hooks()
     {
         interop::writeJmp(0x00502190, &partner_switch);
@@ -188,6 +303,7 @@ namespace openre::player
         interop::writeJmp(0x4FC3CE, itembox_prev_slot);
         interop::writeJmp(0x5024D0, set_inventory_item);
         interop::writeJmp(0x502500, set_inventory_item_quantity);
+        interop::writeJmp(0x4D97B0, player_move);
     }
 
     bool is_aiming()
