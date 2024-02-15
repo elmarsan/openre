@@ -5,6 +5,7 @@
 #include "re2.h"
 #include "scd.h"
 #include "sce.h"
+#include <iostream>
 
 using namespace openre::sce;
 
@@ -29,8 +30,12 @@ namespace openre::player
     static uint8_t*& byte_98ED39 = *((uint8_t**)0x98ED39);
     static HudInfo& gHudInfo = *((HudInfo*)0x691F60);
 
-    using MoveType = int (*)(void*);
-    static MoveType* gMoveTable = (MoveType*)0x53A7DC;
+    using MoveFunc0 = int (*)(void*);
+    using MoveFunc1 = int (*)(PlayerEntity*, int, int);
+
+    static MoveFunc0* gMoveFunc0Table = (MoveFunc0*)0x53A7DC;
+    static MoveFunc1* gMoveFunc1Table0 = (MoveFunc1*)0x53A7FC;
+    static MoveFunc1* gMoveFunc1Table1 = (MoveFunc1*)0x53A82C;
 
     static const InventoryDef _initialInventoryAda[FULL_INVENTORY_SIZE] = {
         { ITEM_TYPE_HANDGUN_CLAIRE, 13, 0 },
@@ -245,7 +250,7 @@ namespace openre::player
         {
             player->damage_cnt--;
         }
-       
+
         if (player->id == 13)
         {
             auto v3 = static_cast<uint8_t>((player->life << 15) / (player->max_life) >> 8);
@@ -284,7 +289,7 @@ namespace openre::player
                 }
             }
         }
-        gMoveTable[player->routine_0](player);
+        gMoveFunc0Table[player->routine_0](player);
         pl_neck(0x1B58u, 1500);
         rot_neck(player->cdir.y);
         if ((player->type & 0xFFF) == 12)
@@ -296,6 +301,15 @@ namespace openre::player
         mag_down();
     }
 
+    // 0x004D9D20
+    static void pl_move(PlayerEntity* player)
+    {
+        gMoveFunc1Table0[player->routine_1](player, gGameTable.g_key, gGameTable.key_trg);
+        auto pKan = *reinterpret_cast<uint32_t*>(&(player->pKan_t_ptr));
+        auto seq = *reinterpret_cast<uint32_t*>(&(player->pSeq_t_ptr));
+        gMoveFunc1Table1[player->routine_1](player, pKan, seq);
+    }
+
     void player_init_hooks()
     {
         interop::writeJmp(0x00502190, &partner_switch);
@@ -304,6 +318,7 @@ namespace openre::player
         interop::writeJmp(0x5024D0, set_inventory_item);
         interop::writeJmp(0x502500, set_inventory_item_quantity);
         interop::writeJmp(0x4D97B0, player_move);
+        interop::writeJmp(0x4D9D20, pl_move);
     }
 
     bool is_aiming()
