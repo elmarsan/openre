@@ -29,6 +29,22 @@ namespace openre::input
         // ID_KEY_CTL_CONFIGURE: Open settings
     };
 
+    // TODO: Refactor
+    bool moving_right = false;
+    bool moving_left = false;
+
+    bool right()
+    {
+        return moving_right;
+     }
+
+    bool left()
+    {
+        return moving_left;
+    }
+
+    int gamepadState = INPUT_NONE;
+
     int GetGamepadState()
     {
         int gamepadState = INPUT_NONE;
@@ -68,7 +84,6 @@ namespace openre::input
         {
             gamepadState |= INPUT_START;
         }
-
         return gamepadState;
     }
 
@@ -126,12 +141,21 @@ namespace openre::input
         if (rightStickX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
         {
             // Right direction
-            gPlayerEntity.cdir.y += 110;
+            // gPlayerEntity.cdir.y += 110;
+            moving_right = true;
+            moving_left = false;
         }
         else if (rightStickX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
         {
             // Left direction
-            gPlayerEntity.cdir.y -= 110;
+            // gPlayerEntity.cdir.y -= 110;
+            moving_right = false;
+            moving_left = true;
+        }
+        else
+        {
+            moving_right = false;
+            moving_left = false;
         }
     }
 

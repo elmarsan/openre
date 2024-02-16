@@ -1,4 +1,5 @@
 #include "player.h"
+#include "input.h"
 #include "interop.hpp"
 #include "item.h"
 #include "openre.h"
@@ -301,12 +302,103 @@ namespace openre::player
         mag_down();
     }
 
+    // 0x004EDF40
+    static void snd_se_walk(int a0, int a1)
+    {
+        using sig = void (*)(int, int, PlayerEntity*);
+        auto p = (sig)0x004EDF40;
+        return p(a0, a1, &gPlayerEntity);
+    }
+
+    // 0x004C1C30
+    static void joint_move(int a3)
+    {
+        using sig = void (*)(PlayerEntity*, int, int, int);
+        auto p = (sig)0x004C1C30;
+        return p(&gPlayerEntity, gPlayerEntity.pSub0_kan_t_ptr, gPlayerEntity.pSeq_t_ptr, a3);
+    }
+
+    // 0x004B8470
+    static int esp_call(int a0, int a1, Mat16 matrix, Vec16p vec)
+    {
+        using sig = int (*)(int, int, Mat16, Vec16p);
+        auto p = (sig)0x004B8470;
+        return p(a0, a1, matrix, vec);
+    }
+
+    // 0x004DAE70
+    static void player_mv_rotate()
+    {
+        Vec16p pVec{ 0, 3, 6 };
+        if (gPlayerEntity.routine_2 != 0 && gPlayerEntity.routine_2 != 1)
+        {
+            return;
+        }
+        else
+        {
+            gPlayerEntity.routine_2 = 1;
+            gPlayerEntity.spd.x = 0;
+            gPlayerEntity.spd.z = 0;
+            gPlayerEntity.move_no = pVec.x + gPlayerEntity.d_life_u + 458752;
+            gGameTable.fg_status &= 0x3F;
+        }
+
+        joint_move(512);
+        if (*gPlayerEntity.pNow_seq & 0x4000)
+        {
+            snd_se_walk(0, 3 * ((*gPlayerEntity.pNow_seq >> 13) & 1) + 4);
+            gGameTable.word_989EEE = (gGameTable.word_989EEE & 0xFF00) | 2;
+        }
+        if (gPlayerEntity.water && (gPlayerEntity.move_cnt & 1) != 0)
+        {
+            pVec = Vec16p{ 0, 300, 0 };
+            auto sinPartsAddr = gPlayerEntity.pSin_parts_ptr + 1892;
+            auto sinParts = reinterpret_cast<uint8_t*>(&sinPartsAddr);
+
+            if (gPlayerEntity.water < static_cast<uint32_t>(sinParts[24]) + 300)
+            {
+                auto matrix = *reinterpret_cast<Mat16*>(sinParts[72]);
+                esp_call((4 * rnd() + 1548) | 0x1A000000, gPlayerEntity.cdir.y, matrix, pVec);
+            }
+
+            sinParts = reinterpret_cast<uint8_t*>(&gPlayerEntity.pSin_parts_ptr);
+            if (gPlayerEntity.water < static_cast<uint32_t>(sinParts[626]) + 300)
+            {
+                auto matrix = *reinterpret_cast<Mat16*>(sinParts[672]);
+                esp_call((4 * rnd() + 1548) | 0x1A000000, gPlayerEntity.cdir.y, matrix, pVec);
+            }
+        }
+    }
+
     // 0x004D9D20
     static void pl_move(PlayerEntity* player)
     {
-        gMoveFunc1Table0[player->routine_1](player, gGameTable.g_key, gGameTable.key_trg);
         auto pKan = *reinterpret_cast<uint32_t*>(&(player->pKan_t_ptr));
         auto seq = *reinterpret_cast<uint32_t*>(&(player->pSeq_t_ptr));
+
+        // right
+        // 0 Key : 802 pKan : 6b1ed0 seq : 6b1928
+
+        // left
+        // Trigger: 0 Key : 408 pKan : 6b1ed0 seq : 6b1928
+
+        std::cout << std::hex << player->move_no << std::endl;
+
+        if (input::right())
+        {
+            gMoveFunc1Table0[4](player, 0x802, 0);
+            gMoveFunc1Table1[4](player, pKan, seq);
+            return;
+        }
+
+        if (input::left())
+        {
+            gMoveFunc1Table0[4](player, 0x408, 0);
+            gMoveFunc1Table1[4](player, pKan, seq);
+            return;
+        }
+
+        gMoveFunc1Table0[player->routine_1](player, gGameTable.g_key, gGameTable.key_trg);
         gMoveFunc1Table1[player->routine_1](player, pKan, seq);
     }
 
@@ -319,6 +411,7 @@ namespace openre::player
         interop::writeJmp(0x502500, set_inventory_item_quantity);
         interop::writeJmp(0x4D97B0, player_move);
         interop::writeJmp(0x4D9D20, pl_move);
+        interop::writeJmp(0x4DAE70, player_mv_rotate);
     }
 
     bool is_aiming()
