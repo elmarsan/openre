@@ -8,6 +8,7 @@
 #include <windows.h>
 #include <Xinput.h>
 #include <cstdint>
+#include <iostream>
 
 
 using namespace openre::interop;
@@ -29,61 +30,47 @@ namespace openre::input
         // ID_KEY_CTL_CONFIGURE: Open settings
     };
 
-    // TODO: Refactor
-    bool moving_right = false;
-    bool moving_left = false;
-
-    bool right()
-    {
-        return moving_right;
-     }
-
-    bool left()
-    {
-        return moving_left;
-    }
-
     int gamepadState = INPUT_NONE;
 
     int GetGamepadState()
     {
-        int gamepadState = INPUT_NONE;
-        if (gGameTable.g_key == 0)
-        {
-            return gamepadState;
-        }
-        if (gGameTable.g_key & ID_KEY_FORWARD)
-        {
-            gamepadState |= INPUT_UP;
-        }
-        if (gGameTable.g_key & ID_KEY_BACKWARD)
-        {
-            gamepadState |= INPUT_DOWN;
-        }
-        if (gGameTable.g_key & ID_KEY_TURN_RIGHT)
-        {
-            gamepadState |= INPUT_RIGHT;
-        }
-        if (gGameTable.g_key & ID_KEY_TURN_LEFT)
-        {
-            gamepadState |= INPUT_LEFT;
-        }
-        if (gGameTable.g_key & ID_KEY_GET_READY)
-        {
-            gamepadState |= INPUT_X;
-        }
-        if (gGameTable.g_key & ID_KEY_FIRE_AND_CONFIRM)
-        {
-            gamepadState |= INPUT_A;
-        }
-        if (gGameTable.g_key & ID_KEY_RUN_AND_CANCEL)
-        {
-            gamepadState |= INPUT_B;
-        }
-        if (gGameTable.g_key & ID_KEY_MAP)
-        {
-            gamepadState |= INPUT_START;
-        }
+        /* int gamepadState = INPUT_NONE;
+         if (gGameTable.g_key == 0)
+         {
+             return gamepadState;
+         }
+         if (gGameTable.g_key & ID_KEY_FORWARD)
+         {
+             gamepadState |= INPUT_UP;
+         }
+         if (gGameTable.g_key & ID_KEY_BACKWARD)
+         {
+             gamepadState |= INPUT_DOWN;
+         }
+         if (gGameTable.g_key & ID_KEY_TURN_RIGHT)
+         {
+             gamepadState |= INPUT_RIGHT;
+         }
+         if (gGameTable.g_key & ID_KEY_TURN_LEFT)
+         {
+             gamepadState |= INPUT_LEFT;
+         }
+         if (gGameTable.g_key & ID_KEY_GET_READY)
+         {
+             gamepadState |= INPUT_X;
+         }
+         if (gGameTable.g_key & ID_KEY_FIRE_AND_CONFIRM)
+         {
+             gamepadState |= INPUT_A;
+         }
+         if (gGameTable.g_key & ID_KEY_RUN_AND_CANCEL)
+         {
+             gamepadState |= INPUT_B;
+         }
+         if (gGameTable.g_key & ID_KEY_MAP)
+         {
+             gamepadState |= INPUT_START;
+         }*/
         return gamepadState;
     }
 
@@ -136,26 +123,117 @@ namespace openre::input
             return;
         }
 
+        gamepadState = INPUT_NONE;
+
         // Check right joystick position
         SHORT rightStickX = state.Gamepad.sThumbRX;
+        // Right direction
         if (rightStickX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
         {
-            // Right direction
-            // gPlayerEntity.cdir.y += 110;
-            moving_right = true;
-            moving_left = false;
+            gamepadState |= INPUT_RIGHT;
+            gamepadState &= ~INPUT_LEFT;
         }
+        // Left direction
         else if (rightStickX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
         {
-            // Left direction
-            // gPlayerEntity.cdir.y -= 110;
-            moving_right = false;
-            moving_left = true;
+            gamepadState |= INPUT_LEFT;
+            gamepadState &= ~INPUT_RIGHT;
+        } 
+        /*else
+        {
+            gamepadState &= ~INPUT_LEFT;
+            gamepadState &= ~INPUT_RIGHT;
+        }*/
+
+        // Check leftt joystick position
+        //SHORT leftStickY = state.Gamepad.sThumbLY;
+        //// Forward direction
+        //if (leftStickY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+        //{
+        //    gamepadState |= INPUT_UP;
+        //    gamepadState &= ~INPUT_DOWN;
+        //}
+        //// Backward direction
+        //else if (leftStickY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+        //{
+        //    gamepadState |= INPUT_DOWN;
+        //    gamepadState &= ~INPUT_UP;
+        //}
+
+        // B button is pressed
+        if (state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
+        {
+            gamepadState |= INPUT_B;
+        }
+
+        // Threshold for considering the stick movement
+        int deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+        SHORT leftStickX = state.Gamepad.sThumbLX;
+        SHORT leftStickY = state.Gamepad.sThumbLY;
+
+        // Horizontal movement
+        if (leftStickX > deadzone)
+        {
+            if (leftStickY > deadzone)
+            {
+                // Up-right direction
+                // std::cout << "Up-right direction" << std::endl;
+                gamepadState |= INPUT_UP;
+                gamepadState |= INPUT_RIGHT;
+            }
+            else if (leftStickY < -deadzone)
+            {
+                // Down-right direction
+                // std::cout << "Down-right direction" << std::endl;
+                gamepadState |= INPUT_DOWN;
+                gamepadState |= INPUT_RIGHT;
+            }
+            else
+            {
+                // Right direction
+                // std::cout << "Right direction" << std::endl;
+                gamepadState |= INPUT_RIGHT;
+            }
+        }
+        else if (leftStickX < -deadzone)
+        {
+            if (leftStickY > deadzone)
+            {
+                // Up-left direction
+                // std::cout << "Up-left direction" << std::endl;
+                gamepadState |= INPUT_UP;
+                gamepadState |= INPUT_LEFT;
+            }
+            else if (leftStickY < -deadzone)
+            {
+                // Down-left direction
+                //std::cout << "Down-left direction" << std::endl;
+                gamepadState |= INPUT_DOWN;
+                gamepadState |= INPUT_LEFT;
+            }
+            else
+            {
+                // Left direction
+                // std::cout << "Left direction" << std::endl;
+                gamepadState |= INPUT_LEFT;
+            }
         }
         else
         {
-            moving_right = false;
-            moving_left = false;
+            // Vertical movement
+            if (leftStickY > deadzone)
+            {
+                // Up direction
+                // std::cout << "Up direction" << std::endl;
+                gamepadState |= INPUT_UP;
+            }
+            else if (leftStickY < -deadzone)
+            {
+                // Down direction
+                //std::cout << "Down direction" << std::endl;
+                gamepadState |= INPUT_DOWN;
+            }
         }
     }
 

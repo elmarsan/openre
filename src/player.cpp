@@ -6,7 +6,6 @@
 #include "re2.h"
 #include "scd.h"
 #include "sce.h"
-#include <iostream>
 
 using namespace openre::sce;
 
@@ -31,12 +30,15 @@ namespace openre::player
     static uint8_t*& byte_98ED39 = *((uint8_t**)0x98ED39);
     static HudInfo& gHudInfo = *((HudInfo*)0x691F60);
 
-    using MoveFunc0 = int (*)(void*);
-    using MoveFunc1 = int (*)(PlayerEntity*, int, int);
+    using MoveTypeFunc = int (*)(void*);
+    static MoveTypeFunc* gMoveTypeTable = (MoveTypeFunc*)0x53A7DC;
 
-    static MoveFunc0* gMoveFunc0Table = (MoveFunc0*)0x53A7DC;
-    static MoveFunc1* gMoveFunc1Table0 = (MoveFunc1*)0x53A7FC;
-    static MoveFunc1* gMoveFunc1Table1 = (MoveFunc1*)0x53A82C;
+    using MoveFunc = void (*)(PlayerEntity*, uint32_t, uint32_t);
+    static MoveFunc* gMoveBrTable = (MoveFunc*)0x53A7FC;
+    static MoveFunc* gMoveMvTable = (MoveFunc*)0x53A82C;
+
+    void (*br_tbl[13])(PlayerEntity* player, uint32_t key, uint32_t key_trg);
+    void (*mv_tbl[13])(PlayerEntity* player, uint32_t pKanPtr, uint32_t pSeqPtr);
 
     static const InventoryDef _initialInventoryAda[FULL_INVENTORY_SIZE] = {
         { ITEM_TYPE_HANDGUN_CLAIRE, 13, 0 },
@@ -245,9 +247,9 @@ namespace openre::player
         {
             return;
         }
-        gGameTable.word_989EEE = (gGameTable.word_989EEE & 0xFF00) | 0xE0;
+        gGameTable.word_989EEE &= 0xE0;
         gGameTable.fg_status &= ~0x80;
-        if (!(player->damage_cnt & 0x7F))
+        if (player->damage_cnt & 0x7F)
         {
             player->damage_cnt--;
         }
@@ -290,7 +292,8 @@ namespace openre::player
                 }
             }
         }
-        gMoveFunc0Table[player->routine_0](player);
+
+        gMoveTypeTable[player->routine_0](player);
         pl_neck(0x1B58u, 1500);
         rot_neck(player->cdir.y);
         if ((player->type & 0xFFF) == 12)
@@ -303,19 +306,19 @@ namespace openre::player
     }
 
     // 0x004EDF40
-    static void snd_se_walk(int a0, int a1)
+    static void snd_se_walk(int a0, int a1, PlayerEntity* player)
     {
         using sig = void (*)(int, int, PlayerEntity*);
         auto p = (sig)0x004EDF40;
-        return p(a0, a1, &gPlayerEntity);
+        return p(a0, a1, player);
     }
 
     // 0x004C1C30
-    static void joint_move(int a3)
+    static void joint_move(PlayerEntity* player, int a1, int a2, int a3)
     {
         using sig = void (*)(PlayerEntity*, int, int, int);
         auto p = (sig)0x004C1C30;
-        return p(&gPlayerEntity, gPlayerEntity.pSub0_kan_t_ptr, gPlayerEntity.pSeq_t_ptr, a3);
+        return p(player, a1, a2, a3);
     }
 
     // 0x004B8470
@@ -330,7 +333,7 @@ namespace openre::player
     static void player_mv_rotate()
     {
         Vec16p pVec{ 0, 3, 6 };
-        if (gPlayerEntity.routine_2 != 0 && gPlayerEntity.routine_2 != 1)
+        if (gPlayerEntity.routine_2 && gPlayerEntity.routine_2 != 1)
         {
             return;
         }
@@ -339,30 +342,32 @@ namespace openre::player
             gPlayerEntity.routine_2 = 1;
             gPlayerEntity.spd.x = 0;
             gPlayerEntity.spd.z = 0;
-            gPlayerEntity.move_no = pVec.x + gPlayerEntity.d_life_u + 458752;
-            gGameTable.fg_status &= 0x3F;
+            gPlayerEntity.move_no = *reinterpret_cast<uint32_t*>(&gPlayerEntity.d_life_u) + 458752;
+            gGameTable.fg_status &= 0xffffffC0;
         }
 
-        joint_move(512);
+        joint_move(&gPlayerEntity, gPlayerEntity.pKan_t_ptr, gPlayerEntity.pSeq_t_ptr, 512);
+
         if (*gPlayerEntity.pNow_seq & 0x4000)
         {
-            snd_se_walk(0, 3 * ((*gPlayerEntity.pNow_seq >> 13) & 1) + 4);
-            gGameTable.word_989EEE = (gGameTable.word_989EEE & 0xFF00) | 2;
+            snd_se_walk(0, 3 * ((*gPlayerEntity.pNow_seq >> 13) & 1) + 4, &gPlayerEntity);
+            gGameTable.word_989EEE |= 2;
         }
+
         if (gPlayerEntity.water && (gPlayerEntity.move_cnt & 1) != 0)
         {
             pVec = Vec16p{ 0, 300, 0 };
             auto sinPartsAddr = gPlayerEntity.pSin_parts_ptr + 1892;
             auto sinParts = reinterpret_cast<uint8_t*>(&sinPartsAddr);
 
-            if (gPlayerEntity.water < static_cast<uint32_t>(sinParts[24]) + 300)
+            if (gPlayerEntity.water < static_cast<int32_t>(sinParts[24]) + 300)
             {
                 auto matrix = *reinterpret_cast<Mat16*>(sinParts[72]);
                 esp_call((4 * rnd() + 1548) | 0x1A000000, gPlayerEntity.cdir.y, matrix, pVec);
             }
 
             sinParts = reinterpret_cast<uint8_t*>(&gPlayerEntity.pSin_parts_ptr);
-            if (gPlayerEntity.water < static_cast<uint32_t>(sinParts[626]) + 300)
+            if (gPlayerEntity.water < static_cast<int32_t>(sinParts[626]) + 300)
             {
                 auto matrix = *reinterpret_cast<Mat16*>(sinParts[672]);
                 esp_call((4 * rnd() + 1548) | 0x1A000000, gPlayerEntity.cdir.y, matrix, pVec);
@@ -376,30 +381,127 @@ namespace openre::player
         auto pKan = *reinterpret_cast<uint32_t*>(&(player->pKan_t_ptr));
         auto seq = *reinterpret_cast<uint32_t*>(&(player->pSeq_t_ptr));
 
-        // right
-        // 0 Key : 802 pKan : 6b1ed0 seq : 6b1928
+        gMoveBrTable[player->routine_1](player, gGameTable.g_key, gGameTable.key_trg);
+        gMoveMvTable[player->routine_1](player, player->pKan_t_ptr, player->pSeq_t_ptr);
+    }
 
-        // left
-        // Trigger: 0 Key : 408 pKan : 6b1ed0 seq : 6b1928
+    // 0x004DA6C0
+    static void pl_br_03(PlayerEntity* player, uint32_t key, uint32_t key_trg)
+    {
+        static uint8_t tbl[] = { 0x28, 0x10, 0x10 };
 
-        std::cout << std::hex << player->move_no << std::endl;
-
-        if (input::right())
+        if (!player->routine_2 || !player->move_cnt)
         {
-            gMoveFunc1Table0[4](player, 0x802, 0);
-            gMoveFunc1Table1[4](player, pKan, seq);
-            return;
+            int t = player->d_life_u;
+            player->d_life_u = 0;
+            if (player->life <= 100)
+            {
+                player->d_life_u = 1;
+            }
+            if (gPoisonStatus)
+            {
+                player->d_life_u = 1;
+            }
+            if (player->life <= 20)
+            {
+                player->d_life_u = 2;
+            }
+            if (t != player->d_life_u)
+            {
+                player->routine_2 = 0;
+            }
+        }
+        // back is pressed
+        if (key & 4)
+        {
+            // left
+            if (key & 2)
+            {
+                player->cdir.y += tbl[player->d_life_u];
+            }
+            // right
+            if (key & 8)
+            {
+                player->cdir.y -= tbl[player->d_life_u];
+            }
+
+            // run/cancel
+            if (key_trg & 0x0200)
+            {
+                // trigger quickturn
+                *(uint32_t*)&player->routine_0 = 0xC01;
+                return;
+            }
+            if ((key_trg & 0x80) != 0)
+            {
+                player->status_flg |= 0x200000;
+            }
+            if (key & 0x100 && player->type & 0xFFF)
+            {
+                *(uint32_t*)player->routine_0 = 0x501;
+            }
+        }
+        else
+        {
+            *(uint32_t*)&player->routine_0 = 1;
+
+            if (key & 0xA)
+            {
+                *(uint32_t*)&player->routine_0 = 0x401;
+            }
+
+            if (key & 1)
+            {
+                *(uint32_t*)&player->routine_0 = 0x101;
+            }
+        }
+    }
+
+    // no input code is required for quickturn
+    void pl_br_quickturn(PlayerEntity* player, uint32_t key, uint32_t key_trg) {}
+
+    void pl_mv_quickturn(PlayerEntity* player, uint32_t pKanPtr, uint32_t pSeqPtr)
+    {
+        switch (player->routine_2)
+        {
+        case 0:
+            player->routine_2 = 1;
+            player->timer0 = 0;
+            // set base walk animation
+            *(uint32_t*)&player->move_no = 0x070000;
+
+        case 1:
+            if (player->timer0++ < 8)
+            {
+                player->cdir.y += 2048 / 8;
+            }
+            else
+            {
+                *(uint32_t*)&player->routine_0 = 1;
+            }
+            break;
         }
 
-        if (input::left())
+        if (*player->pNow_seq & 0x4000)
         {
-            gMoveFunc1Table0[4](player, 0x408, 0);
-            gMoveFunc1Table1[4](player, pKan, seq);
-            return;
+            snd_se_walk(0, 3 * ((*player->pNow_seq >> 13) & 1) + 4, player);
+            gGameTable.word_989EEE |= 2;
         }
+        joint_move(player, player->pKan_t_ptr, player->pSeq_t_ptr, 512);
+    }
 
-        gMoveFunc1Table0[player->routine_1](player, gGameTable.g_key, gGameTable.key_trg);
-        gMoveFunc1Table1[player->routine_1](player, pKan, seq);
+    void init_quickturn_move()
+    {
+        // fill expanded tables with old code
+        std::memcpy(br_tbl, gMoveBrTable, 12 * 4);
+        std::memcpy(mv_tbl, gMoveMvTable, 12 * 4);
+        // set hooks for quickturn
+        br_tbl[03] = pl_br_03;
+        br_tbl[12] = pl_br_quickturn;
+        mv_tbl[12] = pl_mv_quickturn;
+        // replace old table pointers
+        gMoveBrTable = br_tbl;
+        gMoveMvTable = mv_tbl;
     }
 
     void player_init_hooks()
@@ -412,6 +514,8 @@ namespace openre::player
         interop::writeJmp(0x4D97B0, player_move);
         interop::writeJmp(0x4D9D20, pl_move);
         interop::writeJmp(0x4DAE70, player_mv_rotate);
+        interop::writeJmp(0x004DA6C0, pl_br_03);
+        init_quickturn_move();
     }
 
     bool is_aiming()

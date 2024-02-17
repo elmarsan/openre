@@ -18,8 +18,5 @@ namespace openre::input
     };
     
     [[nodiscard]] int GetGamepadState();
-    void input_init_hooks();
-
-    bool right();
-    bool left();
+    void input_init_hooks();    
 };
