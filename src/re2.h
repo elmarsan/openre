@@ -435,7 +435,9 @@ struct GameTable
     uint32_t input_keyboard;            // 0x680558
     uint8_t pad_68055C[49];             // 0x68055C
     uint16_t can_draw;                  // 0x68058D
-    uint8_t pad_68058F[36449];          // 0x68058F
+    uint8_t pad_68058F[11];             // 0x68058F
+    uint8_t blood_censor;               // 0x68059A
+    uint8_t pad_68059B[36437];          // 0x68059B
     uint32_t dword_6893F0;              // 0x6893F0
     uint32_t door_state;                // 0x6893F4
     uint8_t pad_6893F8[8];              // 0x6893F8

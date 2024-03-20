@@ -7,6 +7,7 @@
 #include "sce.h"
 #include <cassert>
 #include <cstring>
+#include <iostream>
 
 using namespace openre::audio;
 using namespace openre::sce;
@@ -32,6 +33,7 @@ namespace openre::scd
         SCD_CUT_OLD = 0x2A,
         SCD_AOT_SET = 0x2C,
         SCD_WORK_SET = 0x2E,
+        SCD_SCE_ESPR_ON = 0x3A,
         SCD_DOOR_AOT_SE = 0x3B,
         SCD_PLC_MOTION = 0x3F,
         SCD_ITEM_AOT_SET = 0x4E,
@@ -592,6 +594,97 @@ namespace openre::scd
         return SCD_RESULT_NEXT;
     }
 
+    // 0x004E7210
+    static Mat16* get_matrix(int matrixKind, int id)
+    {
+        using sig = Mat16* (*)(int, int);
+        auto p = (sig)0x004E7210;
+        return p(matrixKind, id);
+    }
+
+    // 0x004B8470
+    static int esp_call(int a0, int a1, Mat16 matrix, Vec16p vec)
+    {
+        using sig = int (*)(int, int, Mat16, Vec16p);
+        auto p = (sig)0x004B8470;
+        return p(a0, a1, matrix, vec);
+    }
+
+    struct ScdSceEsprOn
+    {
+        uint8_t Opcode;
+        uint8_t zAlign;
+
+        uint16_t var_02;
+        uint16_t var_03;
+        uint16_t var_04;
+
+        int16_t x;
+        int16_t y;
+        int16_t z;
+        int16_t dirY;
+    };
+
+    // struct tagSce_espr_on
+    //{
+    //     UCHAR Opcode;
+    //     UCHAR zAlign;
+    //     USHORT data0;
+    //     USHORT data1;
+    //     USHORT data2;
+    //     SHORT X;
+    //     SHORT Y;
+    //     SHORT Z;
+    //     SHORT DirY;
+    // } Sce_espr_on; // 0x3A	// Sce_espr_on
+
+    // struct tagSce_espr_on2
+    //{
+    //     UCHAR Opcode;    // 0x00	// 0x63
+    //     UCHAR dir_y_id2; // 0x01	// Esp_call2() parameter
+    //     USHORT data1;    // 0x02	// Esp_call2() parameter
+    //     UCHAR WorkKind;  // 0x04	// Get_matrix() parameter 0
+    //     UCHAR WorkNo;    // 0x05	// Get_matrix() parameter 1
+    //     USHORT data3;    // 0x06	// Esp_call2() parameter
+    //     SHORT X;         // 0x08	// Esp_call2() parameter
+    //     SHORT Y;         // 0x0A	// Esp_call2() parameter
+    //     SHORT Z;         // 0x0C	// Esp_call2() parameter
+    //     USHORT DirY;     // 0x0E	// Esp_call2() parameter
+    // } Sce_espr_on2;      // 0x64	// 0x00 bytes // Sce_espr_on2
+
+    // 0x004E6E30
+    static int scd_sce_espr_on(SceTask* sce)
+    {
+        std::cout << "scd_sce_espr_on" << std::endl;
+        auto opcode = reinterpret_cast<ScdSceEsprOn*>(sce->data);
+
+        auto zAlign = static_cast<uint16_t>(opcode->zAlign);
+        auto var_02 = opcode->var_02;
+        auto* matrix = get_matrix(var_02, var_02 & 0xFF);
+        auto var_03 = opcode->var_03;
+        Vec16p pVec{
+             static_cast<int16_t>(opcode->var_04),
+             opcode->x,
+             opcode->y,
+        };
+
+        auto stage = gGameTable.current_stage;
+        auto room = gGameTable.current_room;
+        if ((stage == 4 && room) || (stage != 3 || room != 10))
+        {
+            esp_call(opcode->var_03 | (opcode->zAlign << 8), opcode->z, *matrix, pVec);
+            sce->data += 8;
+            return SCD_RESULT_NEXT;
+        }
+
+        auto esp_call_a1 = (gGameTable.blood_censor | (zAlign << 8)) << 8;            
+        esp_call(opcode->var_03 | ((zAlign | esp_call_a1) << 8), opcode->z, *matrix, pVec);
+        sce->data += 8;
+        return SCD_RESULT_NEXT;
+    }
+
+    // SCD_SCE_ESPR_ON
+
     static void set_scd_hook(ScdOpcode opcode, ScdOpcodeImpl impl)
     {
         gScdImplTable[opcode] = impl;
@@ -617,6 +710,7 @@ namespace openre::scd
         set_scd_hook(SCD_CUT_OLD, &scd_cut_old);
         set_scd_hook(SCD_AOT_SET, &scd_aot_set);
         set_scd_hook(SCD_WORK_SET, &scd_work_set);
+        set_scd_hook(SCD_SCE_ESPR_ON, &scd_sce_espr_on);
         set_scd_hook(SCD_DOOR_AOT_SE, &scd_door_aot_se);
         set_scd_hook(SCD_PLC_MOTION, &scd_plc_motion);
         set_scd_hook(SCD_SCE_KEY_CK, &scd_sce_key_ck);
