@@ -5,6 +5,7 @@
 #include "itembox.h"
 #include "openre.h"
 #include "re2.h"
+#include <iostream>
 
 using namespace openre::audio;
 using namespace openre::file;
@@ -111,6 +112,9 @@ namespace openre::hud
     // 0x004FCBC0
     static void hud_render_itembox_items()
     {
+        // std::cout << "current_stage: " << gGameTable.current_stage << std::endl;
+        // std::cout << "current_room: " << gGameTable.current_room << std::endl;
+        // std::cout << "fg_room: " << gGameTable.fg_room << std::endl;
         using sig = void (*)();
         auto p = (sig)0x004FCBC0;
         p();
@@ -330,7 +334,11 @@ namespace openre::hud
                     snd_se_on(0x4060000);
                     gGameTable.itembox_slot_id = (gGameTable.itembox_slot_id - 5) & 0x3F;
                     const auto& type = gGameTable.itembox[(gGameTable.itembox_slot_id - 1) & 0x3F].Type;
-                    hud_render_inventory_text(gGameTable.word_691FB0 + 7, gGameTable.word_691FB0 + gGameTable.byte_691F85 + 9, 6, type != ITEM_TYPE_NONE ? type : 100);
+                    hud_render_inventory_text(
+                        gGameTable.word_691FB0 + 7,
+                        gGameTable.word_691FB0 + gGameTable.byte_691F85 + 9,
+                        6,
+                        type != ITEM_TYPE_NONE ? type : 100);
                     break;
                 }
                 snd_se_on(0x4050000);
@@ -406,7 +414,8 @@ namespace openre::hud
             }
             const auto& item = gGameTable.itembox[(gGameTable.itembox_slot_id + 5) & 0x3F];
             auto text = item.Type == ITEM_TYPE_NONE ? 100 : item.Type;
-            hud_render_inventory_text(gGameTable.word_691FB0 + 7, gGameTable.word_691FB2 + gGameTable.byte_691F85 + 129, 6, text);
+            hud_render_inventory_text(
+                gGameTable.word_691FB0 + 7, gGameTable.word_691FB2 + gGameTable.byte_691F85 + 129, 6, text);
             goto default_case;
         }
         case ITEM_BOX_STATE_EXCHANGE:

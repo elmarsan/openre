@@ -12,6 +12,7 @@
 #include "re2.h"
 #include "scd.h"
 #include "sce.h"
+#include "room.h"
 #include <cassert>
 #include <cstring>
 #include <windows.h>
@@ -26,6 +27,7 @@ using namespace openre::scd;
 using namespace openre::sce;
 using namespace openre::input;
 using namespace openre::camera;
+using namespace openre::room;
 
 namespace openre
 {
@@ -384,6 +386,7 @@ void onAttach()
     hud_init_hooks();
     input_init_hooks();
     camera_init_hooks();
+    init_room_hooks();
 }
 
 extern "C" {

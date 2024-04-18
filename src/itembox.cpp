@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 namespace openre::itembox
 {
@@ -36,7 +37,7 @@ namespace openre::itembox
         std::vector<ItemboxItem> sortedItems(ITEMBOX_SIZE);
         for (uint8_t i = 0; i < ITEMBOX_SIZE; i++)
         {
-            auto& item = gGameTable.itembox[i];
+            auto& item = gGameTable.itembox[i];            
             if (item.Type != ITEM_TYPE_NONE)
             {
                 if (!is_stackable(item.Type))
@@ -90,5 +91,35 @@ namespace openre::itembox
         std::rotate(sortedItems.rbegin(), sortedItems.rbegin() + 2, sortedItems.rend());
 
         std::copy(sortedItems.begin(), sortedItems.end(), gGameTable.itembox);
+    }    
+
+    std::vector<ItemboxItem> itembox201(ITEMBOX_SIZE);
+    std::vector<ItemboxItem> itembox208(ITEMBOX_SIZE);
+
+    bool survivalMode = true;
+
+    void load_itembox()
+    {
+        if (!survivalMode)
+        {
+            return;
+        }
+
+        if (gGameTable.current_room == 8)
+        {
+            std::cout << "Getting 208 itembox" << std::endl;
+            auto& item = itembox208[2];
+            item.Type = ITEM_TYPE_AMMO_SHOTGUN;
+            item.Quantity = 1;            
+            std::copy(itembox208.begin(), itembox208.end(), gGameTable.itembox);
+        }
+        else if (gGameTable.current_room == 1)
+        {
+            std::cout << "Getting 201 itembox" << std::endl;
+            auto& item = itembox201[2];
+            item.Type = ITEM_TYPE_HANDGUN_LEON;
+            item.Quantity = 1;
+            std::copy(itembox201.begin(), itembox201.end(), gGameTable.itembox);                        
+        }        
     }
 };

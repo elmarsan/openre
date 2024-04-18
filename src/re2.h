@@ -419,7 +419,9 @@ struct GameTable
 {
     uint8_t pad_0000[5394102];          // 0x0000
     bool enable_dsound;                 // 0x524EB6
-    uint8_t pad_524EB7[5041];           // 0x524EB7
+    uint8_t pad_524EB7[2];              // 0x524EB7
+    uint8_t graphicsPtr;                // 0x524EB9
+    uint8_t pad_524EBA[5038];           // 0x524EBA
     int32_t global_prj;                 // 0x526268
     uint8_t pad_52626C[85932];          // 0x52626C
     uint32_t* flag_groups[35];          // 0x53B218
@@ -452,7 +454,11 @@ struct GameTable
     DoorInfo* door;                     // 0x689400
     uint8_t pad_689404[2008];           // 0x689404
     uint32_t dword_689BDC;              // 0x689BDC
-    uint8_t pad_689BE0[536];            // 0x689BE0
+    uint8_t pad_689BE0[64];             // 0x689BE0
+    char* room_path;                    // 0x689C20
+    uint8_t pad_689C24[28];             // 0x689C24
+    char* current_stage_font;           // 0x689C40
+    uint8_t pad_689C44[436];            // 0x689C44
     uint32_t dword_689DF8;              // 0x689DF8
     uint8_t pad_689DFC[1032];           // 0x689DFC
     Unknown68A204* ctcb;                // 0x68A204
