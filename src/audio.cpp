@@ -222,10 +222,34 @@ namespace openre::audio
         snd_se_on(a0, nullptr);
     }
 
+    // 0x004EC9C0
+    static void snd_bgm_set()
+    {
+        using sig = void (*)();
+        auto p = (sig)0x004EC9C0;
+        p();
+    }
+
+    // 0x004EC450
+    static void snd_load_core(uint8_t id, uint8_t a1)
+    {
+        using sig = void (*)(uint8_t, uint8_t);
+        auto p = (sig)0x004EC450;
+        p(id, a1);
+    }
+
+    // 0x004EC8A0
+    static void snd_load_em()
+    {
+        using sig = void (*)();
+        auto p = (sig)0x004EC8A0;
+        p();
+    }
+
     void bgm_init_hooks()
     {
         interop::writeJmp(0x004ECDA0, snd_bgm_main);
         interop::writeJmp(0x004ED920, bgm_set_entry);
-        // interop::writeJmp(0x004ED950, snd_se_on);
+        // interop::writeJmp(0x004ED950, snd_se_on)0x004EC9C0;
     }
 }
