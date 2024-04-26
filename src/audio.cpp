@@ -246,6 +246,14 @@ namespace openre::audio
         p();
     }
 
+    // 0x004ECCE0
+    static void snd_bgm_play_ck()
+    {
+        using sig = void (*)();
+        auto p = (sig)0x004ECCE0;
+        p();
+    }
+
     void bgm_init_hooks()
     {
         interop::writeJmp(0x004ECDA0, snd_bgm_main);

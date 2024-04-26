@@ -1,11 +1,15 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "sce.h"
 #include "audio.h"
 #include "file.h"
 #include "interop.hpp"
 #include "marni.h"
 #include "openre.h"
+#include "player.h"
+#include "rdt.h"
 #include "room.h"
+#include "camera.h"
 
 #include <cstdint>
 #include <cstring>
@@ -13,6 +17,10 @@
 using namespace openre::file;
 using namespace openre::audio;
 using namespace openre::marni;
+using namespace openre::sce;
+using namespace openre::player;
+using namespace openre::rdt;
+using namespace openre::camera;
 
 namespace openre::room
 {
@@ -38,6 +46,7 @@ namespace openre::room
     static ObjectEntity* _om = (ObjectEntity*)0x98A61C;
     static uint16_t& word_98EB24 = *((uint16_t*)0x98EB24);
     static uint32_t& dword_68059C = *((uint32_t*)0x68059C);
+    static uint32_t& dword_988628 = *((uint32_t*)0x988628);
 
     // osp stuff
     static uint8_t* _ospBuffer = (uint8_t*)0x698840;
@@ -47,7 +56,7 @@ namespace openre::room
     static uint8_t rbj_set()
     {
         using sig = uint8_t (*)();
-        auto p = (sig)0x004EC7D0;
+        auto p = (sig)0x004B4480;
         return p();
     }
 
@@ -58,7 +67,15 @@ namespace openre::room
         auto p = (sig)0x004DD0C0;
         return p();
     }
-
+    
+    // 0x004B8080
+    static void Esp_init_R()
+    {
+        using sig = void (*)();
+        auto p = (sig)0x004B8080;
+        p();
+    }
+    
     // 0x004DD0E0
     static void psp_init1()
     {
@@ -118,6 +135,15 @@ namespace openre::room
         using sig = void (*)();
         auto p = (sig)0x0043DF40;
         p();
+    }
+
+    // TODO: Where this go???
+    // 0x0043F550
+    static int UnloadTexturePage(int page)
+    {
+        using sig = int (*)(int);
+        auto p = (sig)0x0043F550;
+        return p(page);
     }
 
     // TODO: move to player.h
@@ -211,7 +237,8 @@ namespace openre::room
                 dword_68A204->var_0D = 10;
                 goto LABEL_35;
             }
-            case 1: snd_load_core(word_98EB24, 1);
+            case 1:  
+                goto LABEL_62;
             case 2:
                 dword_68A204->var_0D = 3;
                 byte_99270F = 0;
@@ -229,13 +256,88 @@ namespace openre::room
                 break;
             case 4:
             case 5:
+                /* word_989EE8 = 3333; */
+                /* Osp_cache(); */
+                /* byte_689C64 = 1; */
+                /* rdt_size = BufferizeFile(room_path, lpBuffer, 8u); */
+                /* if (!rdt_size) */
+                /*     goto LABEL_73; */
                 word_989EE8 = 3333;
                 read_osp();
                 if (read_file_into_buffer(_rdtPathBuffer, byte_98861C, 8) == 0)
                 {
                     file_error();
                 }
-                // loc_4DECB9
+
+                /* v11 = lpBuffer; */
+                /* v12 = lpBuffer + 2; */
+                /* rdt_p_top = (int)(lpBuffer + 2); */
+                /* do */
+                /* { */
+                /*     if (*v12) */
+                /*     { */
+                /*         *v12 = (char*)*v12 + (_DWORD)v11; */
+                /*         v11 = lpBuffer; */
+                /*         v12 = (LPVOID*)rdt_p_top; */
+                /*     } */
+                /*     rdt_p_top = (int)++v12; */
+                /* } while (v12 < v11 + 25); */
+                /* v13 = 0; */
+                /* rdt_nCount = 0; */
+                /* if (*((_BYTE*)v11 + 1)) */
+                /* { */
+                /*     do */
+                /*     { */
+                /*         v14 = (char*)v11[9] + 32 * v13 + 28; */
+                /*         *v14 += v11; */
+                /*         v11 = lpBuffer; */
+                /*         v13 = rdt_nCount + 1; */
+                /*         rdt_nCount = v13; */
+                /*     } while (v13 < *((unsigned __int8*)lpBuffer + 1)); */
+                /* } */
+                /* v15 = 0; */
+                /* Mem_top = (LPVOID*)((char*)Mem_top + rdt_size); */
+                /* rdt_nCount = 0; */
+                /* if (*((_BYTE*)v11 + 2)) */
+                /* { */
+                /*     do */
+                /*     { */
+                /*         *((_DWORD*)v11[12] + 2 * v15) += v11; */
+                /*         v16 = (char*)lpBuffer[12] + 8 * rdt_nCount + 4; */
+                /*         *v16 += lpBuffer; */
+                /*         v11 = lpBuffer; */
+                /*         v15 = rdt_nCount + 1; */
+                /*         rdt_nCount = v15; */
+                /*     } while (v15 < *((unsigned __int8*)lpBuffer + 2)); */
+                /* } */
+
+
+                /* Cut_change(scd_var_cut); */
+                /* Esp_init_R(); */
+                /* *(_BYTE*)(pCtcb + 13) = 6; */
+                cut_change(gGameTable.current_cut); 
+                Esp_init_R();
+                dword_68A204->var_13 = 6;
+            LABEL_84:
+                snd_room_load();
+                if (dword_68A204->var_13 == 0)
+                {
+                    UnloadTexturePage(17);
+                    sce_model_init();
+                    snd_bgm_play_ck();
+                    auto vb = rdt_get_offset<void*>(RdtOffsetKind::VB);
+                    if (vb)
+                    {
+                        gGameTable.mem_top = vb;
+                    }
+                    // TODO: Check two following instructions
+                    /* dword_988628 = &pPl; */
+                    /* dword_988628 = &gGameTable.player_work; */
+                    gGameTable.player_work->routine_0 = 0;
+                    player_move(gGameTable.player_work);
+                    sce_scheduler_set();
+                    dword_68A204->var_13 = 7;
+                }
 
             LABEL_88:
                 snd_load_em();
@@ -268,6 +370,7 @@ namespace openre::room
                 /* break; */
                 return;
             case 10:
+            LABEL_35:
                 snd_bgm_set();
                 if (dword_68A204->var_13 == 0)
                 {
@@ -297,8 +400,21 @@ namespace openre::room
                         // loc_4DEA4E
                     }
                 }
-                break;
-            default: return;
+            LABEL_44:
+                /* v0 = pCtcb; */
+                /* v1 = *(unsigned __int8 *)(pCtcb + 13); */
+                /* if ( v1 > 0xA ) */
+                /*     return; */
+                /* continue; */
+
+            LABEL_60:
+
+            LABEL_62:
+
+            LABEL63:
+
+                /* break; */
+            /* default: return; */
             }
         }
     }

@@ -13,5 +13,6 @@ namespace openre::audio
     void snd_bgm_set();
     void snd_load_core(uint8_t id, uint8_t a1);
     void snd_load_em();
+    void snd_bgm_play_ck();
     void bgm_init_hooks();
 }
