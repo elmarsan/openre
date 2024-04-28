@@ -1,3 +1,5 @@
+#include "re2.h"
+#include <cstddef>
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "sce.h"
@@ -268,9 +270,18 @@ namespace openre::room
                 {
                     file_error();
                 }
-
+                
+                // RdtHeader
                 /* v11 = lpBuffer; */
+                // RdtOffset
                 /* v12 = lpBuffer + 2; */
+
+                auto rdt_p_top = rdt_get_offset<void*>(RdtOffsetKind::EDT);
+                for (int i = 0; i < 23; i++) 
+                {
+                    /* gGameTable.rdt->offsets[i] = 0; */
+
+                }
                 /* rdt_p_top = (int)(lpBuffer + 2); */
                 /* do */
                 /* { */
@@ -282,8 +293,13 @@ namespace openre::room
                 /*     } */
                 /*     rdt_p_top = (int)++v12; */
                 /* } while (v12 < v11 + 25); */
+
                 /* v13 = 0; */
                 /* rdt_nCount = 0; */
+                if (gGameTable.rdt->header.num_cuts != 0)
+                {
+
+                }
                 /* if (*((_BYTE*)v11 + 1)) */
                 /* { */
                 /*     do */
@@ -298,6 +314,11 @@ namespace openre::room
                 /* v15 = 0; */
                 /* Mem_top = (LPVOID*)((char*)Mem_top + rdt_size); */
                 /* rdt_nCount = 0; */
+
+                if (gGameTable.rdt->header.num_models != 0)
+                {
+
+                }
                 /* if (*((_BYTE*)v11 + 2)) */
                 /* { */
                 /*     do */
