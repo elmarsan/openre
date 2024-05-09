@@ -124,6 +124,13 @@ namespace openre
         FG_STOP_DISABLE_INPUT = 7,
     };
 
+    enum 
+    {
+        FG_ZAPPING_05 = 5,
+        FG_ZAPPING_06 = 6,
+        FG_ZAPPING_15 = 15,
+    };
+
     extern GameTable& gGameTable;
     extern uint32_t& gGameFlags;
     extern uint32_t& gErrorCode;

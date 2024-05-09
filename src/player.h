@@ -48,6 +48,6 @@ namespace openre::player
     bool is_aiming();
     void set_routine(Routine routine);
 
-
     void player_move(PlayerEntity* player);
+    void player_set(PlayerEntity* player);
 }

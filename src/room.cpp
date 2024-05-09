@@ -2,8 +2,8 @@
 #include <cstddef>
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "sce.h"
 #include "audio.h"
+#include "camera.h"
 #include "file.h"
 #include "interop.hpp"
 #include "marni.h"
@@ -11,10 +11,11 @@
 #include "player.h"
 #include "rdt.h"
 #include "room.h"
-#include "camera.h"
+#include "sce.h"
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 using namespace openre::file;
 using namespace openre::audio;
@@ -27,32 +28,25 @@ using namespace openre::camera;
 namespace openre::room
 {
     static char* _rdtPathBuffer = (char*)0x689C20;
-    static uint32_t& dword_98E798 = *((uint32_t*)0x98E798);
     static const char* _stageSymbols = "123456789abcdefg";
-    static uint32_t& dword_988620 = *((uint32_t*)0x988620);
-    static uint32_t& dword_989E68 = *((uint32_t*)0x989E68);
-    static uint16_t& word_98E78C = *((uint16_t*)0x98E78C);
-    static uint32_t& dword_98861C = *((uint32_t*)0x98861C);
-    static uint8_t& byte_99270F = *((uint8_t*)0x99270F);
-    static uint8_t& byte_989E7D = *((uint8_t*)0x989E7D);
+    // TODO: rdt
     static void*& byte_98861C = *((void**)0x98861C);
-    static uint16_t& word_989EE8 = *((uint16_t*)0x989EE8);
-    static uint32_t& dword_98862C = *((uint32_t*)0x98862C);
-    static uint8_t& byte_989EEB = *((uint8_t*)0x989EEB);
-    static void** dword_98A110 = (void**)0x98A110;
-    static char* dword_98E544 = (char*)0x98E544;
-    static uint32_t& _rdtnCount = *((uint32_t*)0x689C10);
-    static uint16_t& word_98A616 = *((uint16_t*)0x98A616);
-    static uint16_t& word_98A61A = *((uint16_t*)0x98A61A);
-    static ObjectEntity*& dword_98E51C = *((ObjectEntity**)0x98E51C);
-    static ObjectEntity* _om = (ObjectEntity*)0x98A61C;
-    static uint16_t& word_98EB24 = *((uint16_t*)0x98EB24);
-    static uint32_t& dword_68059C = *((uint32_t*)0x68059C);
-    static uint32_t& dword_988628 = *((uint32_t*)0x988628);
-
+    static uint32_t& word_98861C = *((uint32_t*)0x98861C);
     // osp stuff
     static uint8_t* _ospBuffer = (uint8_t*)0x698840;
     static uint8_t& _ospMaskFlag = *((uint8_t*)0x6998C0);
+    // Unknown
+    static void** dword_98A110 = (void**)0x98A110;
+    static char* dword_98E544 = (char*)0x98E544;
+    static ObjectEntity*& dword_98E51C = *((ObjectEntity**)0x98E51C);
+
+    // 0x00502190
+    static char* st_chenge_pl(int a0)
+    {
+        using sig = char* (*)(int);
+        auto p = (sig)0x00502190;
+        return p(a0);
+    }
 
     // 0x004B4480
     static uint8_t rbj_set()
@@ -69,7 +63,7 @@ namespace openre::room
         auto p = (sig)0x004DD0C0;
         return p();
     }
-    
+
     // 0x004B8080
     static void Esp_init_R()
     {
@@ -77,7 +71,7 @@ namespace openre::room
         auto p = (sig)0x004B8080;
         p();
     }
-    
+
     // 0x004DD0E0
     static void psp_init1()
     {
@@ -105,7 +99,7 @@ namespace openre::room
 
     static void set_registry_flg(int index, int sub)
     {
-        *((uint32_t*)&dword_68059C + index + (sub >> 5)) |= 0x80000000 >> (sub & 0x1F);
+        *((uint32_t*)&gGameTable.dword_68059C + index + (sub >> 5)) |= 0x80000000 >> (sub & 0x1F);
     }
 
     // TODO: move to osp.h ??
@@ -124,11 +118,11 @@ namespace openre::room
     }
 
     // 0x004450C0
-    static void sub_4450C0()
+    static int sub_4450C0(int a0)
     {
-        using sig = void (*)();
+        using sig = int (*)(int);
         auto p = (sig)0x004450C0;
-        p();
+        return p(a0);
     }
 
     // 0x0043DF40
@@ -157,7 +151,7 @@ namespace openre::room
     // TODO: move to rdt.h
     static void get_rdt_path(char* buffer, uint8_t player, uint8_t stage, uint8_t room)
     {
-        auto stageSym = _stageSymbols[(dword_98E798 & 0xFF) + gGameTable.current_stage];
+        auto stageSym = _stageSymbols[(gGameTable.dword_98E798 & 0xFF) + gGameTable.current_stage];
         std::sprintf(buffer, "Pl%d\\Rdt\\room%c%02x%d.rdt", player, stageSym, room, player);
     }
 
@@ -180,7 +174,7 @@ namespace openre::room
                     get_rdt_path(
                         _rdtPathBuffer,
                         get_player_num(),
-                        (dword_98E798 & 0xFF) + gGameTable.current_stage,
+                        (gGameTable.dword_98E798 & 0xFF) + gGameTable.current_stage,
                         gGameTable.current_room & 0xFF);
 
                     switch (gGameTable.current_stage)
@@ -229,25 +223,32 @@ namespace openre::room
                     }
                 }
 
-                word_98E78C = 0;
-                dword_989E68 = 0;
+                gGameTable.word_98E78C = 0;
+                gGameTable.dword_989E68 = 0;
                 gGameFlags &= 0xFFF04000;
                 gGameTable.player_work->pOn_om = 0;
                 gGameTable.player_work->status_flg &= 0xF9FF;
-                _memTop = dword_988620;
-                dword_98861C = dword_988620;
+                _memTop = gGameTable.dword_988620;
+                dword_98861C = gGameTable.dword_988620;
                 dword_68A204->var_0D = 10;
                 goto LABEL_35;
             }
-            case 1:  
-                goto LABEL_62;
+            case 1:
+                snd_load_core(gGameTable.next_pld, 1);
+                if (dword_68A204->var_13 == 0)
+                {
+                    gGameTable.byte_99270F = 0;
+                    dword_68A204->var_13 = 3;
+                    task_sleep(1);
+                }
+                break;
             case 2:
                 dword_68A204->var_0D = 3;
-                byte_99270F = 0;
+                gGameTable.byte_99270F = 0;
                 task_sleep(1);
                 break;
             case 3:
-                if (gGameTable.current_stage == byte_989E7D)
+                if (gGameTable.current_stage == gGameTable.byte_989E7D)
                 {
                     dword_68A204->var_0D = 5;
                 }
@@ -264,23 +265,22 @@ namespace openre::room
                 /* rdt_size = BufferizeFile(room_path, lpBuffer, 8u); */
                 /* if (!rdt_size) */
                 /*     goto LABEL_73; */
-                word_989EE8 = 3333;
+                gGameTable.word_989EE8 = 3333;
                 read_osp();
                 if (read_file_into_buffer(_rdtPathBuffer, byte_98861C, 8) == 0)
                 {
                     file_error();
                 }
-                
+
                 // RdtHeader
                 /* v11 = lpBuffer; */
                 // RdtOffset
                 /* v12 = lpBuffer + 2; */
 
                 auto rdt_p_top = rdt_get_offset<void*>(RdtOffsetKind::EDT);
-                for (int i = 0; i < 23; i++) 
+                for (int i = 0; i < 23; i++)
                 {
                     /* gGameTable.rdt->offsets[i] = 0; */
-
                 }
                 /* rdt_p_top = (int)(lpBuffer + 2); */
                 /* do */
@@ -298,7 +298,6 @@ namespace openre::room
                 /* rdt_nCount = 0; */
                 if (gGameTable.rdt->header.num_cuts != 0)
                 {
-
                 }
                 /* if (*((_BYTE*)v11 + 1)) */
                 /* { */
@@ -317,7 +316,6 @@ namespace openre::room
 
                 if (gGameTable.rdt->header.num_models != 0)
                 {
-
                 }
                 /* if (*((_BYTE*)v11 + 2)) */
                 /* { */
@@ -332,11 +330,10 @@ namespace openre::room
                 /*     } while (v15 < *((unsigned __int8*)lpBuffer + 2)); */
                 /* } */
 
-
                 /* Cut_change(scd_var_cut); */
                 /* Esp_init_R(); */
                 /* *(_BYTE*)(pCtcb + 13) = 6; */
-                cut_change(gGameTable.current_cut); 
+                cut_change(gGameTable.current_cut);
                 Esp_init_R();
                 dword_68A204->var_13 = 6;
             LABEL_84:
@@ -359,7 +356,6 @@ namespace openre::room
                     sce_scheduler_set();
                     dword_68A204->var_13 = 7;
                 }
-
             LABEL_88:
                 snd_load_em();
                 if (dword_68A204->var_13 == 0)
@@ -375,9 +371,8 @@ namespace openre::room
                     // em_init_move();
                     psp_init1();
                     dword_68A204->var_13 = 9;
-
                 LABEL_92:
-                    if (byte_99270F)
+                    if (gGameTable.byte_99270F)
                     {
                         task_sleep(1);
                     }
@@ -388,54 +383,113 @@ namespace openre::room
                         dword_68A204->var_13 = 0;
                     }
                 }
-                /* break; */
                 return;
+            case 6:
+                std::cout << "Set room 8" << std::endl;
+                goto LABEL_84;
+            case 7:
+                std::cout << "Set room 8" << std::endl;
+                goto LABEL_88;
+            case 8:
+                std::cout << "Set room 8" << std::endl;
+                goto LABEL_90;
+            case 9:
+                std::cout << "Set room 9" << std::endl;
+                goto LABEL_92;
             case 10:
+                std::cout << "Set room 10" << std::endl;
             LABEL_35:
                 snd_bgm_set();
-                if (dword_68A204->var_13 == 0)
+                if (dword_68A204->var_13)
                 {
-                    sub_4450C0();
-                    dword_98862C = 0x0098A114;
-                    byte_989EEB = 0;
-                    for (auto i = 0; i < 33; i++)
+                    return;
+                }
+                sub_4450C0(1);
+                // TODO: Use enemy work
+                /* dword_98862C = gGameTable.enemies[0]; */
+                gGameTable.dword_98862C = 0x0098A114;
+                gGameTable.byte_989EEB = 0;
+                for (auto i = 0; i < 33; i++)
+                {
+                    dword_98A110[i] = dword_98E544;
+                }
+                gGameTable.rdt_nCount = 0;
+                gGameTable.word_98A616 = 0;
+                gGameTable.word_98A61A = 0;
+                sub_43DF40();
+                dword_98E51C = gGameTable.obj_model_work;
+                gGameTable.rdt_nCount = 32;
+                for (auto i = 0; i < 32; i++)
+                {
+                    gGameTable.obj_model_work->be_flg = 0;
+                }
+                if (gGameTable.player_work->id == gGameTable.next_pld)
+                {
+                    dword_68A204->var_0D = 2;
+                LABEL_44:
+                    if (dword_68A204->var_0D > 10)
                     {
-                        dword_98A110[i] = dword_98E544;
+                        return;
                     }
-                    _rdtnCount = 0;
-                    word_98A616 = 0;
-                    word_98A61A = 0;
-                    sub_43DF40();
-                    dword_98E51C = _om;
-                    _rdtnCount = 32;
-                    for (auto i = 0; i < 32; i++)
+                    continue;
+                }
+                if (gGameTable.next_pld < 12)
+                {
+                    if ((gGameTable.next_pld & 1) != 0)
                     {
-                        _om->be_flg = 0;
-                    }
-                    if (gGameTable.player_work->id == word_98EB24)
-                    {
-                        dword_68A204->var_0D = 2;
-                    }
-                    else
-                    {
-                        // loc_4DEA4E
+                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_05))
+                        {
+                            gGameTable.next_pld = 9;
+                        }
+                        else
+                        {
+                            if (check_flag(FlagGroup::Zapping, openre::FG_ZAPPING_05))
+                            {
+                                gGameTable.next_pld = 8;
+                            }
+                            if (check_flag(FlagGroup::Zapping, openre::FG_ZAPPING_15))
+                            {
+                                gGameTable.next_pld = 10;
+                            }
+                        }
                     }
                 }
-            LABEL_44:
-                /* v0 = pCtcb; */
-                /* v1 = *(unsigned __int8 *)(pCtcb + 13); */
-                /* if ( v1 > 0xA ) */
-                /*     return; */
-                /* continue; */
-
-            LABEL_60:
-
-            LABEL_62:
-
-            LABEL63:
-
-                /* break; */
-            /* default: return; */
+                gGameTable.dword_689C1C = gGameTable.player_work->id;
+                gPlayerEntity.id = gGameTable.next_pld;
+                st_chenge_pl(gGameTable.next_pld);
+                player_set(gGameTable.player_work);
+                if (dword_68A204->var_13 == 0)
+                {
+                    gPlayerEntity.routine_0 = 0;
+                    gPlayerEntity.routine_1 = 0;
+                    gPlayerEntity.routine_2 = 0;
+                    gPlayerEntity.routine_3 = 0;
+                    if (gGameTable.next_pld == 14 || gGameTable.next_pld == 15)
+                    {
+                        gGameTable.word_98E9B6 = gPlayerEntity.life;
+                        gGameTable.byte_98E9AB = gPoisonTimer;
+                        gGameTable.word_98E9AC = gPoisonStatus;
+                        gPoisonTimer = 0;
+                        gPoisonStatus = 0;
+                        gPlayerEntity.life = gPlayerEntity.max_life;
+                    }
+                    else if (gGameTable.dword_689C1C >= 12)
+                    {
+                        gPlayerEntity.life = gGameTable.word_98E9B6;
+                        gPoisonTimer = gGameTable.byte_98E9AB;
+                        gPoisonStatus = gGameTable.word_98E9AC;
+                    }
+                    gGameTable.byte_691F7B = 1;
+                    dword_68A204->var_0D = 1;
+                    snd_load_core(gGameTable.next_pld, 1);
+                    if (dword_68A204->var_13 == 0)
+                    {
+                        gGameTable.byte_99270F = 0;
+                        dword_68A204->var_13 = 3;
+                        task_sleep(1);
+                    }
+                }
+                return;
             }
         }
     }

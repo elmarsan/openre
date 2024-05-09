@@ -958,6 +958,21 @@ namespace openre::player
         gMoveDamageTable = dmg_tbl;
     }
 
+    bool is_aiming()
+    {
+        return (
+                check_flag(FlagGroup::Status, FG_STATUS_GAMEPLAY) && check_flag(FlagGroup::Status, FG_STATUS_25)
+                && check_flag(FlagGroup::Status, FG_STATUS_24) && !check_flag(FlagGroup::Status, FG_STATUS_SCREEN));
+    }
+
+    // 0x004D93A0
+    static void player_set(PlayerEntity* player)
+    {
+        using sig = void* (*)(PlayerEntity*);
+        auto p = (sig)0x004D93A0;
+        p(player);
+    }
+
     void player_init_hooks()
     {
         interop::writeJmp(0x00502190, &partner_switch);
@@ -970,12 +985,5 @@ namespace openre::player
         interop::writeJmp(0x4DC130, pl_mv_damage);
 
         init_move_tables();
-    }
-
-    bool is_aiming()
-    {
-        return (
-            check_flag(FlagGroup::Status, FG_STATUS_GAMEPLAY) && check_flag(FlagGroup::Status, FG_STATUS_25)
-            && check_flag(FlagGroup::Status, FG_STATUS_24) && !check_flag(FlagGroup::Status, FG_STATUS_SCREEN));
     }
 }
