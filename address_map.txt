@@ -461,8 +461,8 @@ declare     vcut_data               VCut*[19]               0x00988630
 declare     door_aot_data           void*                   0x00988848
 declare     aot_table               void*[32]               0x00988850
 declare     dword_9888D8            u16                     0x009888D8
-declare     fg_system               u32                     0x00989E6C
 declare     dword_989E68            u32                     0x00989E68
+declare     fg_system               u32                     0x00989E6C
 declare     byte_989E7D             u8                      0x00989E7D
 declare     fg_status               u32                     0x00989ED0
 declare     fg_stop                 u32                     0x00989ED4
@@ -530,8 +530,8 @@ declare     byte_98F07B             u8                      0x0098F07B
 declare     fade_table              Fade[4]                 0x0098F07C
 declare     byte_98F98F             u8[4]                   0x0098F98F
 declare     byte_991F80             u8                      0x00991F80
-declare     byte_99270F             u8                      0x0099270F
 declare     dword_991FC4            u32                     0x00991FC4
+declare     byte_99270F             u8                      0x0099270F
 declare     doors                   DoorEntity*[9]          0x0099CEA0
 declare     dword_99CEC4            u32                     0x0099CEC4
 declare     dword_99CF64            u32                     0x0099CF64
