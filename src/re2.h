@@ -492,12 +492,15 @@ struct GameTable
     uint32_t dword_689BDC;              // 0x689BDC
     uint8_t pad_689BE0[48];             // 0x689BE0
     uint32_t rdt_nCount;                // 0x689C10
-    uint8_t pad_689C14[8];              // 0x689C14
+    void* rdt_p_top;                    // 0x689C14
+    uint32_t rdt_size;                  // 0x689C18
     uint32_t dword_689C1C;              // 0x689C1C
     char* room_path;                    // 0x689C20
     uint8_t pad_689C24[28];             // 0x689C24
     char* current_stage_font;           // 0x689C40
-    uint8_t pad_689C44[436];            // 0x689C44
+    uint8_t pad_689C44[32];             // 0x689C44
+    uint8_t byte_689C64;                // 0x689C64
+    uint8_t pad_689C65[403];            // 0x689C65
     uint32_t dword_689DF8;              // 0x689DF8
     uint8_t pad_689DFC[1032];           // 0x689DFC
     Unknown68A204* ctcb;                // 0x68A204
@@ -593,7 +596,7 @@ struct GameTable
     Rdt* rdt;                           // 0x98861C
     uint32_t dword_988620;              // 0x988620
     void* mem_top;                      // 0x988624
-    uint8_t pad_988628[4];              // 0x988628
+    PlayerEntity* dword_988628;         // 0x988628
     uint32_t dword_98862C;              // 0x98862C
     VCut* vcut_data[19];                // 0x988630
     uint8_t pad_98867C[460];            // 0x98867C

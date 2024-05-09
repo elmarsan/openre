@@ -590,7 +590,7 @@ namespace openre::scd
     static int scd_cut_replace(SceTask* sce)
     {
         auto opcode = reinterpret_cast<ScdCutReplace*>(sce->data);
-        auto rvd = rdt_get_offset<uintptr_t>(RdtOffsetKind::RVD);
+        auto rvd = rdt_get_offset<uintptr_t>(RDT_OFFSET_KIND_RVD);
         auto vCuts = reinterpret_cast<VCut*>((uint32_t)rvd + 2);
 
         if (vCuts->be_flg != -1)

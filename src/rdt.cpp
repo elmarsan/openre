@@ -4,7 +4,7 @@
 namespace openre::rdt
 {
     template<>
-    void* rdt_get_offset(RdtOffsetKind kind)
+    void* rdt_get_offset(int kind)
     {
         auto index = static_cast<size_t>(kind);
         return gGameTable.rdt->offsets[index];

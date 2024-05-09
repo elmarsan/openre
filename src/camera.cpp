@@ -10,7 +10,7 @@ namespace openre::camera
     // 0x004C4E90
     static VCut* cut_search(uint8_t cut_id)
     {
-        auto vcut = rdt_get_offset<VCut>(RdtOffsetKind::RVD);
+        auto vcut = rdt_get_offset<VCut>(RDT_OFFSET_KIND_RVD);
         while (vcut->fCut != cut_id)
         {
             vcut++;

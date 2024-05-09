@@ -263,11 +263,11 @@ namespace openre::sce
 
         // Begin init scd procedure
         gGameTable.sce_type = SCE_TYPE_MAIN;
-        gGameTable.scd = rdt_get_offset<uint8_t>(RdtOffsetKind::SCD_INIT);
+        gGameTable.scd = rdt_get_offset<uint8_t>(RDT_OFFSET_KIND_SCD_INIT);
         scd_event_exec(TASK_ID_RESERVED_0, EVT_MAIN);
 
         // Begin main scd procedure
-        gGameTable.scd = rdt_get_offset<uint8_t>(RdtOffsetKind::SCD_MAIN);
+        gGameTable.scd = rdt_get_offset<uint8_t>(RDT_OFFSET_KIND_SCD_MAIN);
         scd_event_exec(TASK_ID_RESERVED_1, EVT_MAIN);
 
         sce_scheduler_main();
@@ -284,7 +284,7 @@ namespace openre::sce
         {
             sce_rnd_set();
             gGameTable.sce_type = SCE_TYPE_MAIN;
-            gGameTable.scd = rdt_get_offset<uint8_t>(RdtOffsetKind::SCD_MAIN);
+            gGameTable.scd = rdt_get_offset<uint8_t>(RDT_OFFSET_KIND_SCD_MAIN);
             scd_event_exec(TASK_ID_RESERVED_0, EVT_FRAME);
             sce_scheduler_main();
         }
@@ -530,6 +530,7 @@ namespace openre::sce
         }
     }
 
+    // TODO: Replace by dword_988628
     // 0x004E9880
     static void sce_water(const uint16_t* data)
     {

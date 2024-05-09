@@ -1,7 +1,6 @@
-#include "re2.h"
-#include <cstddef>
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "room.h"
 #include "audio.h"
 #include "camera.h"
 #include "file.h"
@@ -10,9 +9,10 @@
 #include "openre.h"
 #include "player.h"
 #include "rdt.h"
-#include "room.h"
+#include "re2.h"
 #include "sce.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -104,7 +104,7 @@ namespace openre::room
 
     // TODO: move to osp.h ??
     // 0x004DD360
-    static void read_osp()
+    static int read_osp()
     {
         _ospMaskFlag = 1;
         auto eax = (gGameTable.current_stage * 32) + gGameTable.current_room;
@@ -115,6 +115,7 @@ namespace openre::room
             gErrorCode = bytesRead;
             _ospMaskFlag = 0;
         }
+        return bytesRead;
     }
 
     // 0x004450C0
@@ -153,6 +154,14 @@ namespace openre::room
     {
         auto stageSym = _stageSymbols[(gGameTable.dword_98E798 & 0xFF) + gGameTable.current_stage];
         std::sprintf(buffer, "Pl%d\\Rdt\\room%c%02x%d.rdt", player, stageSym, room, player);
+    }
+
+    // 0x004DF180
+    static int em_init_move()
+    {
+        using sig = int (*)();
+        auto p = (sig)0x004DF180;
+        return p();
     }
 
     // 0x004DE7B0
@@ -226,8 +235,8 @@ namespace openre::room
                 gGameTable.word_98E78C = 0;
                 gGameTable.dword_989E68 = 0;
                 gGameFlags &= 0xFFF04000;
-                gGameTable.player_work->pOn_om = 0;
-                gGameTable.player_work->status_flg &= 0xF9FF;
+                gPlayerEntity.pOn_om = 0;
+                gPlayerEntity.status_flg &= 0xF9FF;
                 _memTop = gGameTable.dword_988620;
                 dword_98861C = gGameTable.dword_988620;
                 dword_68A204->var_0D = 10;
@@ -259,44 +268,26 @@ namespace openre::room
                 break;
             case 4:
             case 5:
-                /* word_989EE8 = 3333; */
-                /* Osp_cache(); */
-                /* byte_689C64 = 1; */
-                /* rdt_size = BufferizeFile(room_path, lpBuffer, 8u); */
-                /* if (!rdt_size) */
-                /*     goto LABEL_73; */
                 gGameTable.word_989EE8 = 3333;
                 read_osp();
+                gGameTable.byte_689C64 = 1;
                 if (read_file_into_buffer(_rdtPathBuffer, byte_98861C, 8) == 0)
                 {
                     file_error();
                 }
-
-                // RdtHeader
-                /* v11 = lpBuffer; */
-                // RdtOffset
-                /* v12 = lpBuffer + 2; */
-
-                auto rdt_p_top = rdt_get_offset<void*>(RdtOffsetKind::EDT);
                 for (int i = 0; i < 23; i++)
                 {
-                    /* gGameTable.rdt->offsets[i] = 0; */
+                    auto rdt = rdt_get_offset<void*>(i);
+                    if (rdt != nullptr)
+                    {
+                        // TODO
+                        /* rdt += gGameTable.rdt->header; */
+                        /* *rdt = (char *)*rdt + gGameTable.rdt->header; */
+                    }
+                    gGameTable.rdt_p_top = rdt;
                 }
-                /* rdt_p_top = (int)(lpBuffer + 2); */
-                /* do */
-                /* { */
-                /*     if (*v12) */
-                /*     { */
-                /*         *v12 = (char*)*v12 + (_DWORD)v11; */
-                /*         v11 = lpBuffer; */
-                /*         v12 = (LPVOID*)rdt_p_top; */
-                /*     } */
-                /*     rdt_p_top = (int)++v12; */
-                /* } while (v12 < v11 + 25); */
-
-                /* v13 = 0; */
-                /* rdt_nCount = 0; */
-                if (gGameTable.rdt->header.num_cuts != 0)
+                gGameTable.rdt_nCount = 0;
+                if (gGameTable.rdt->header.num_cuts)
                 {
                 }
                 /* if (*((_BYTE*)v11 + 1)) */
@@ -312,9 +303,8 @@ namespace openre::room
                 /* } */
                 /* v15 = 0; */
                 /* Mem_top = (LPVOID*)((char*)Mem_top + rdt_size); */
-                /* rdt_nCount = 0; */
-
-                if (gGameTable.rdt->header.num_models != 0)
+                gGameTable.rdt_nCount = 0;
+                if (gGameTable.rdt->header.num_models)
                 {
                 }
                 /* if (*((_BYTE*)v11 + 2)) */
@@ -335,7 +325,7 @@ namespace openre::room
                 /* *(_BYTE*)(pCtcb + 13) = 6; */
                 cut_change(gGameTable.current_cut);
                 Esp_init_R();
-                dword_68A204->var_13 = 6;
+                dword_68A204->var_0D = 6;
             LABEL_84:
                 snd_room_load();
                 if (dword_68A204->var_13 == 0)
@@ -343,16 +333,17 @@ namespace openre::room
                     UnloadTexturePage(17);
                     sce_model_init();
                     snd_bgm_play_ck();
-                    auto vb = rdt_get_offset<void*>(RdtOffsetKind::VB);
+                    auto vb = rdt_get_offset<void*>(RDT_OFFSET_KIND_VB);
                     if (vb)
                     {
                         gGameTable.mem_top = vb;
                     }
-                    // TODO: Check two following instructions
-                    /* dword_988628 = &pPl; */
-                    /* dword_988628 = &gGameTable.player_work; */
-                    gGameTable.player_work->routine_0 = 0;
-                    player_move(gGameTable.player_work);
+                    gGameTable.dword_988628 = &gPlayerEntity;
+                    gPlayerEntity.routine_0 = 0;
+                    gPlayerEntity.routine_1 = 0;
+                    gPlayerEntity.routine_2 = 0;
+                    gPlayerEntity.routine_3 = 0;
+                    player_move(&gPlayerEntity);
                     sce_scheduler_set();
                     dword_68A204->var_13 = 7;
                 }
@@ -362,15 +353,15 @@ namespace openre::room
                 {
                     rbj_set();
                     psp_init0();
-                    dword_68A204->var_13 = 8;
+                    dword_68A204->var_0D = 8;
                 }
             LABEL_90:
                 out();
                 if (dword_68A204->var_13 == 0)
                 {
-                    // em_init_move();
+                    em_init_move();
                     psp_init1();
-                    dword_68A204->var_13 = 9;
+                    dword_68A204->var_0D = 9;
                 LABEL_92:
                     if (gGameTable.byte_99270F)
                     {
@@ -380,35 +371,24 @@ namespace openre::room
                     {
                         st_room_set();
                         flush_surfaces();
-                        dword_68A204->var_13 = 0;
+                        dword_68A204->var_0D = 0;
                     }
                 }
                 return;
-            case 6:
-                std::cout << "Set room 8" << std::endl;
-                goto LABEL_84;
-            case 7:
-                std::cout << "Set room 8" << std::endl;
-                goto LABEL_88;
-            case 8:
-                std::cout << "Set room 8" << std::endl;
-                goto LABEL_90;
-            case 9:
-                std::cout << "Set room 9" << std::endl;
-                goto LABEL_92;
+            case 6: goto LABEL_84;
+            case 7: goto LABEL_88;
+            case 8: goto LABEL_90;
+            case 9: goto LABEL_92;
             case 10:
-                std::cout << "Set room 10" << std::endl;
             LABEL_35:
                 snd_bgm_set();
                 if (dword_68A204->var_13)
                 {
                     return;
                 }
-                sub_4450C0(1);
-                // TODO: Use enemy work
-                /* dword_98862C = gGameTable.enemies[0]; */
+                sub_4450C0(0);
+                // TODO: Make dword_98862C EnemyEntity*
                 gGameTable.dword_98862C = 0x0098A114;
-                gGameTable.byte_989EEB = 0;
                 for (auto i = 0; i < 33; i++)
                 {
                     dword_98A110[i] = dword_98E544;
@@ -423,7 +403,7 @@ namespace openre::room
                 {
                     gGameTable.obj_model_work->be_flg = 0;
                 }
-                if (gGameTable.player_work->id == gGameTable.next_pld)
+                if (gPlayerEntity.id == gGameTable.next_pld)
                 {
                     dword_68A204->var_0D = 2;
                 LABEL_44:
@@ -454,10 +434,10 @@ namespace openre::room
                         }
                     }
                 }
-                gGameTable.dword_689C1C = gGameTable.player_work->id;
+                gGameTable.dword_689C1C = gPlayerEntity.id;
                 gPlayerEntity.id = gGameTable.next_pld;
                 st_chenge_pl(gGameTable.next_pld);
-                player_set(gGameTable.player_work);
+                player_set(&gPlayerEntity);
                 if (dword_68A204->var_13 == 0)
                 {
                     gPlayerEntity.routine_0 = 0;
