@@ -488,7 +488,9 @@ struct GameTable
     uint32_t door_state;                // 0x6893F4
     uint8_t pad_6893F8[8];              // 0x6893F8
     DoorInfo* door;                     // 0x689400
-    uint8_t pad_689404[2008];           // 0x689404
+    uint8_t pad_689404[1093];           // 0x689404
+    uint8_t stage_bk;                   // 0x689849
+    uint8_t pad_68984A[914];            // 0x68984A
     uint32_t dword_689BDC;              // 0x689BDC
     uint8_t pad_689BE0[48];             // 0x689BE0
     uint32_t rdt_nCount;                // 0x689C10

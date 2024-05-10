@@ -97,6 +97,14 @@ namespace openre::room
         return p();
     }
 
+    // 0x00441630
+    static void* file_alloc(size_t a0)
+    {
+        using sig = void* (*)(size_t);
+        auto p = (sig)0x00441630;
+        p(a0);
+    }
+
     static void set_registry_flg(int index, int sub)
     {
         *((uint32_t*)&gGameTable.dword_68059C + index + (sub >> 5)) |= 0x80000000 >> (sub & 0x1F);
@@ -162,6 +170,14 @@ namespace openre::room
         using sig = int (*)();
         auto p = (sig)0x004DF180;
         return p();
+    }
+
+    // 0x0043FF40
+    static int tim_buffer_to_surface(uint32_t* pTim, uint8_t page, int mode)
+    {
+        using sig = int (*)(uint32_t*, uint8_t, int);
+        auto p = (sig)0x0043FF40;
+        return p(pTim, page, mode);
     }
 
     // 0x004DE7B0
@@ -260,12 +276,36 @@ namespace openre::room
                 if (gGameTable.current_stage == gGameTable.byte_989E7D)
                 {
                     dword_68A204->var_0D = 5;
+                    // TODO 
+                    /* goto LABEL_44; */
                 }
-                else
+                gGameTable.byte_989E7D = gGameTable.current_stage;
+                if (gGameTable.stage_bk == gGameTable.current_stage)
                 {
-                    // loc_4DEBC4
+                    dword_68A204->var_0D = 4;
+                    task_sleep(1);
+                    return;
                 }
-                break;
+                auto v9 = file_alloc(0x20014u);
+                gGameTable.current_stage_font[16] += gGameTable.byte_989E7D;
+                switch (gGameTable.graphicsPtr)
+                {
+                case 0:
+                case 2:
+                    // TODO: Implement ADT file loading
+                    break;
+                case 1:
+                    if (read_file_into_buffer(gGameTable.current_stage_font, v9, 4) == 0)
+                    {
+                        file_error();
+                    }
+                    break;
+                }
+                tim_buffer_to_surface(static_cast<uint32_t*>(v9), 9 , 1);
+                file_alloc(0);
+                gGameTable.stage_bk = gGameTable.byte_989E7D;
+                dword_68A204->var_0D = 4;
+                task_sleep(1);
             case 4:
             case 5:
                 gGameTable.word_989EE8 = 3333;

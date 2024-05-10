@@ -388,6 +388,7 @@ declare     dword_68059C            u32                     0x0068059C
 declare     dword_6893F0            u32                     0x006893F0
 declare     door_state              u32                     0x006893F4
 declare     door                    DoorInfo*               0x00689400
+declare     stage_bk                u8                      0x00689849
 declare     dword_689BDC            u32                     0x00689BDC
 declare     rdt_nCount              u32                     0x00689C10
 declare     rdt_p_top               void*                   0x00689C14
