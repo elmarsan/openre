@@ -2,6 +2,7 @@
 
 #include "file.h"
 #include "openre.h"
+#include <iostream.h>
 #include <windows.h>
 
 namespace openre::file
@@ -56,5 +57,34 @@ namespace openre::file
         using sig = uint32_t (*)(const char*, void*, size_t, size_t, size_t);
         auto p = (sig)0x00509540;
         return p(path, buffer, offset, length, unk);
+    }
+
+    // 0x0043C590
+    int load_adt(const char* path, void* buffer, int mode)
+    {
+        std::cout << "load_adt" << std::endl;
+        gGameTable.dword_99DAC8 = 0;
+        if (gGameTable.error_no == 11)
+        {
+            return 0;
+        }
+        gGameTable.dword_671404 = 0;
+        gGameTable.dword_671408 = 0;
+        gGameTable.dword_67140C = 0;
+        gGameTable.dword_671410 = 0;
+        gGameTable.dword_671414 = 0;
+        gGameTable.dword_671418 = 0;
+        gGameTable.dword_524E08 = 8;
+        gGameTable.dword_524E0C = 0x4000;
+        gGameTable.dword_99DAB4 = 0;
+        gGameTable.dword_99DAB8 = 0;
+        gGameTable.dword_99DAB0 = 0;
+        /* gGameTable.dword_99DAA8 = (int)pBuffer; */
+        return 0;
+    }
+
+    void file_init_hooks()
+    {
+        interop::writeJmp(0x004E5020, &sub_4E5020);
     }
 }
