@@ -686,13 +686,16 @@ struct GameTable
     uint32_t dword_99CF70;              // 0x99CF70
     uint8_t pad_99CF74[2828];           // 0x99CF74
     uint32_t dword_99DA80;              // 0x99DA80
-    uint8_t pad_99DA84[36];             // 0x99DA84
+    uint8_t pad_99DA84[32];             // 0x99DA84
+    void* lpBuffer0;                    // 0x99DAA4
     uint32_t dword_99DAA8;              // 0x99DAA8
-    uint8_t pad_99DAAC[4];              // 0x99DAAC
+    uint32_t hObject;                   // 0x99DAAC
     uint32_t dword_99DAB0;              // 0x99DAB0
     uint32_t dword_99DAB4;              // 0x99DAB4
     uint32_t dword_99DAB8;              // 0x99DAB8
-    uint8_t pad_99DABC[12];             // 0x99DABC
+    void* lpBuffer1;                    // 0x99DABC
+    uint32_t num_bytes_to_read;         // 0x99DAC0
+    uint8_t pad_99DAC4[4];              // 0x99DAC4
     uint32_t dword_99DAC8;              // 0x99DAC8
 };
 static_assert(sizeof(GameTable) == 0x99DACC);

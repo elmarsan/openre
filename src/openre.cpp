@@ -137,12 +137,13 @@ namespace openre
     }
 
     // 0x004427E0
-    static void update_timer()
+    int update_timer()
     {
         auto time = timeGetTime();
         _timerCurrent = time;
         _timerLast = time;
         _timer10 = time * 10;
+        return time;
     }
 
     // 0x004DD360
@@ -360,6 +361,7 @@ void onAttach()
     hud_init_hooks();
     input_init_hooks();
     camera_init_hooks();
+    file_init_hooks();
 }
 
 extern "C" {

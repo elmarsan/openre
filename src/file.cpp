@@ -2,8 +2,11 @@
 
 #include "file.h"
 #include "openre.h"
-#include <iostream.h>
 #include <windows.h>
+
+#include <iostream>
+
+using namespace openre;
 
 namespace openre::file
 {
@@ -16,11 +19,11 @@ namespace openre::file
     }
 
     // 0x00509020
-    static HANDLE file_open_handle(const char* path, int a1)
+    static HANDLE file_open_handle(const char* path, int mode)
     {
         using sig = HANDLE (*)(const char*, int);
         auto p = (sig)0x00509020;
-        return p(path, a1);
+        return p(path, mode);
     }
 
     // 0x00502D40
@@ -59,12 +62,44 @@ namespace openre::file
         return p(path, buffer, offset, length, unk);
     }
 
+    // 0x00441670
+    static void* alloc0(const size_t size)
+    {
+        using sig = void* (*)(const size_t);
+        auto p = (sig)0x00441670;
+        return p(size);
+    }
+
+    // 0x004416B0
+    static void* alloc1(const size_t size)
+    {
+        using sig = void* (*)(const size_t);
+        auto p = (sig)0x004416B0;
+        return p(size);
+    }
+
+    // 0x00509620
+    static void* sub_509620(const char* path)
+    {
+        using sig = void* (*)(const char*);
+        auto p = (sig)0x00509620;
+        return p(path);
+    }
+
+    // 0x0043C390
+    static int decompress_adt()
+    {
+        using sig = int (*)();
+        auto p = (sig)0x0043C390;
+        return p();
+    }
+
     // 0x0043C590
     int load_adt(const char* path, void* buffer, int mode)
     {
         std::cout << "load_adt" << std::endl;
         gGameTable.dword_99DAC8 = 0;
-        if (gGameTable.error_no == 11)
+        if (gErrorCode == 11)
         {
             return 0;
         }
@@ -79,12 +114,50 @@ namespace openre::file
         gGameTable.dword_99DAB4 = 0;
         gGameTable.dword_99DAB8 = 0;
         gGameTable.dword_99DAB0 = 0;
-        /* gGameTable.dword_99DAA8 = (int)pBuffer; */
+        gGameTable.dword_99DAA8 = *reinterpret_cast<uint32_t*>(buffer);
+        gGameTable.lpBuffer0 = alloc0(0x8000);
+        gGameTable.lpBuffer1 = alloc1(0x8000);
+        auto hFile = file_open_handle(path, mode);
+        if (hFile != INVALID_HANDLE_VALUE)
+        {
+            auto fileSize = GetFileSize(hFile, NULL);
+            char buff[4];
+
+            if (!ReadFile(hFile, buff, 4, nullptr, nullptr))
+            {
+                alloc1(0);
+                alloc0(0);
+                CloseHandle(hFile);
+                sub_509620(path);
+                gErrorCode = 11;
+                return 0;
+            }
+            if (!ReadFile(hFile, gGameTable.lpBuffer0, 0x8000, reinterpret_cast<LPDWORD>(gGameTable.num_bytes_to_read), nullptr))
+            {
+                alloc1(0);
+                alloc0(0);
+                CloseHandle(hFile);
+                sub_509620(path);
+                gErrorCode = 11;
+                return 0;
+            }
+            decompress_adt();
+            alloc1(0);
+            alloc0(0);
+            update_timer();
+            CloseHandle(hFile);
+            return gGameTable.dword_99DAB4;
+        }
+        alloc1(0);
+        alloc0(0);
+        sub_509620(path);
+        gErrorCode = 11;
         return 0;
     }
 
     void file_init_hooks()
     {
-        interop::writeJmp(0x004E5020, &sub_4E5020);
+        std::cout << "file_init_hooks" << std::endl;
+        /* interop::writeJmp(0x004E5020, &sub_4E5020); */
     }
 }

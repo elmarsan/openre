@@ -143,4 +143,5 @@ namespace openre
     void set_geom_screen(int prj);
     bool check_flag(FlagGroup group, uint32_t index);
     void set_flag(FlagGroup group, uint32_t index, bool value);
+    int update_timer();
 }
