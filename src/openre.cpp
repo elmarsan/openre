@@ -344,10 +344,6 @@ void snd_se_walk(int, int, PlayerEntity* pEm) {}
 
 void onAttach()
 {
-    // interop::writeJmp(0x004DE7B0, &sub_4DE7B0);
-    // interop::writeJmp(0x004EDF40, &snd_se_walk);
-    // interop::writeJmp(0x00502D40, &read_file_into_buffer);
-    // interop::writeJmp(0x00509540, &read_partial_file_into_buffer);
     interop::writeJmp(0x004B7860, load_init_table_1);
     interop::writeJmp(0x004DE650, load_init_table_2);
     interop::writeJmp(0x00505B20, load_init_table_3);
