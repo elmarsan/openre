@@ -689,11 +689,11 @@ struct GameTable
     uint8_t pad_99DA84[32];             // 0x99DA84
     void* lpBuffer0;                    // 0x99DAA4
     uint32_t dword_99DAA8;              // 0x99DAA8
-    uint32_t hObject;                   // 0x99DAAC
+    void* hObject;                      // 0x99DAAC
     uint32_t dword_99DAB0;              // 0x99DAB0
     uint32_t dword_99DAB4;              // 0x99DAB4
     uint32_t dword_99DAB8;              // 0x99DAB8
-    void* lpBuffer1;                    // 0x99DABC
+    uint32_t lpBuffer1;                    // 0x99DABC
     uint32_t num_bytes_to_read;         // 0x99DAC0
     uint8_t pad_99DAC4[4];              // 0x99DAC4
     uint32_t dword_99DAC8;              // 0x99DAC8
