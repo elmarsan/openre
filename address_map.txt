@@ -425,6 +425,7 @@ declare     type                    u16
 declare     enabled                 u16
 
 struct      GameTable
+declare     caption                 char*                   0x00524E6C
 declare     enable_dsound           bool                    0x00524EB6
 declare     global_prj              s32                     0x00526268
 declare     pGG                     void*                   0x0052C4B0
@@ -440,6 +441,8 @@ declare     dword_67CC2C            u32                     0x0067CC2C
 declare     dword_67CE00            u32                     0x0067CE00
 declare     dword_680554            u32                     0x00680554
 declare     input_keyboard          u32                     0x00680558
+declare     h_wnd                   void*                   0x0068056C
+declare     h_instance              void*                   0x00680578
 declare     can_draw                u16                     0x0068058D
 declare     blood_censor            u8                      0x0068059A
 declare     hard_mode               u8                      0x006805B1

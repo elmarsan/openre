@@ -14,6 +14,7 @@
 #include "re2.h"
 #include "scd.h"
 #include "sce.h"
+#include "render.h"
 #include <cassert>
 #include <cstring>
 #include <windows.h>
@@ -30,6 +31,7 @@ using namespace openre::scd;
 using namespace openre::sce;
 using namespace openre::input;
 using namespace openre::camera;
+using namespace openre::render;
 
 namespace openre
 {
@@ -381,6 +383,7 @@ void onAttach()
     camera_init_hooks();
     enemy_init_hooks();
     file_init_hooks();
+    render_init_hooks();
 }
 
 extern "C" {

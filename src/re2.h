@@ -536,7 +536,9 @@ static_assert(sizeof(EnemyInitEntry) == 0x04);
 
 struct GameTable
 {
-    uint8_t pad_0000[5394102];          // 0x0000
+    uint8_t pad_0000[5394028];          // 0x0000
+    char* caption;                      // 0x524E6C
+    uint8_t pad_524E70[70];             // 0x524E70
     bool enable_dsound;                 // 0x524EB6
     uint8_t pad_524EB7[5041];           // 0x524EB7
     int32_t global_prj;                 // 0x526268
@@ -564,7 +566,11 @@ struct GameTable
     uint8_t pad_67CE04[14160];          // 0x67CE04
     uint32_t dword_680554;              // 0x680554
     uint32_t input_keyboard;            // 0x680558
-    uint8_t pad_68055C[49];             // 0x68055C
+    uint8_t pad_68055C[16];             // 0x68055C
+    void* h_wnd;                        // 0x68056C
+    uint8_t pad_680570[8];              // 0x680570
+    void* h_instance;                   // 0x680578
+    uint8_t pad_68057C[17];             // 0x68057C
     uint16_t can_draw;                  // 0x68058D
     uint8_t pad_68058F[11];             // 0x68058F
     uint8_t blood_censor;               // 0x68059A
