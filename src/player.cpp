@@ -9,6 +9,7 @@
 #include "sce.h"
 
 #include <cstring>
+#include <windows.h>
 
 using namespace openre::sce;
 
@@ -683,6 +684,29 @@ namespace openre::player
 
     int pl_mv_quickturn(PlayerEntity* player, Emr* pKanPtr, Edd* pSeqPtr)
     {
+        // HWND hwnd = *((HWND*)0x08982024);
+        WINDOWINFO pwi;
+        pwi.cbSize = sizeof(WINDOWINFO);
+
+        HWND hwnd = reinterpret_cast<HWND>(gGameTable.h_wnd);
+
+        GetWindowInfo(hwnd, &pwi);
+
+        LONG_PTR wndProcPtr = GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+
+        LONG_PTR styleProcPtr = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+
+        // SetWindowPos(
+        //     hwnd,
+        //     0,
+        //     600,
+        //     600,
+        //     800,
+        //     640,
+        //     0);
+        // 
+        // MoveWindow(hwnd, 600, 600, 800, 640, true);
+
         switch (player->routine_2)
         {
         case 0:
