@@ -21,6 +21,43 @@ namespace openre::math
     static void mul_matrix0(Mat16& m1, Mat16& m2, Mat16& res)
     {
         interop::call<void, Mat16&, Mat16&, Mat16&>(0x00450C20, m1, m2, res);
+
+        Mat16 res2{};
+
+        // Row1 
+        res2.m[0] = (static_cast<int32_t>(m1.m[0]) * static_cast<int32_t>(m2.m[0])
+                    + static_cast<int32_t>(m1.m[1]) * static_cast<int32_t>(m2.m[3])
+                    + static_cast<int32_t>(m1.m[2]) * static_cast<int32_t>(m2.m[6]))
+            >> 12;
+
+
+        res2.m[1] = (int(m1.m[0]) * int(m2.m[1]) + int(m1.m[1]) * int(m2.m[4]) + int(m1.m[2]) * int(m2.m[7])) >> 12;
+        res2.m[2] = (int(m1.m[0]) * int(m2.m[2]) + int(m1.m[1]) * int(m2.m[5]) + int(m1.m[2]) * int(m2.m[8])) >> 12;
+
+        // Row 2
+        res2.m[3] = static_cast<int>(m1.m[3] * m2.m[0] + m1.m[4] * m2.m[3] + m1.m[5] * m2.m[6]) >> 12;
+        res2.m[4] = static_cast<int>(m1.m[3] * m2.m[1] + m1.m[4] * m2.m[4] + m1.m[5] * m2.m[7]) >> 12;
+        res2.m[5] = static_cast<int>(m1.m[3] * m2.m[2] + m1.m[4] * m2.m[5] + m1.m[5] * m2.m[8]) >> 12;
+
+        // Row 3
+        res2.m[6] = static_cast<int>(m1.m[6] * m2.m[0] + m1.m[7] * m2.m[3] + m1.m[8] * m2.m[6]) >> 12;
+        res2.m[7] = static_cast<int>(m1.m[6] * m2.m[1] + m1.m[7] * m2.m[4] + m1.m[8] * m2.m[7]) >> 12;
+        res2.m[8] = static_cast<int>(m1.m[6] * m2.m[2] + m1.m[7] * m2.m[5] + m1.m[8] * m2.m[8]) >> 12;
+
+        res2.field_12 = 0;
+
+        // Row 1
+        // res.m[0] = (m1.m[0] * m2.m[0] + m1.m[1] * m2.m[3] + m1.m[2] * m2.m[6]) >> 12;
+        // res.m[1] = (m1.m[0] * m2.m[1] + m1.m[1] * m2.m[4] + m1.m[2] * m2.m[7]) >> 12;
+        // res.m[2] = (m1.m[0] * m2.m[2] + m1.m[1] * m2.m[5] + m1.m[2] * m2.m[8]) >> 12;
+        // Row 2
+        // res.m[3] = (m1.m[3] * m2.m[0] + m1.m[4] * m2.m[3] + m1.m[5] * m2.m[6]) >> 12;
+        // res.m[4] = (m1.m[3] * m2.m[1] + m1.m[4] * m2.m[4] + m1.m[5] * m2.m[7]) >> 12;
+        // res.m[5] = (m1.m[3] * m2.m[2] + m1.m[4] * m2.m[5] + m1.m[5] * m2.m[8]) >> 12;
+        // Row 3
+        // res.m[6] = (m1.m[6] * m2.m[0] + m1.m[7] * m2.m[3] + m1.m[8] * m2.m[6]) >> 12;
+        // res.m[7] = (m1.m[6] * m2.m[1] + m1.m[7] * m2.m[4] + m1.m[8] * m2.m[7]) >> 12;
+        // res.m[8] = (m1.m[6] * m2.m[2] + m1.m[7] * m2.m[5] + m1.m[8] * m2.m[8]) >> 12;
     }
 
     // 0x00451120
