@@ -328,6 +328,24 @@ namespace openre
 #endif
         return mem;
     }
+
+    // 0x0050D89C
+    static int free_(void* ptr)
+    {
+        return interop::call<int, void*>(0x0050D89C, ptr);
+    }
+
+    // 0x0050AA00
+    void* operator_new(const size_t size)
+    {
+        return malloc(size);
+    }
+
+    // 0x0050AA10
+    void operator_delete(void* ptr)
+    {
+        free_(ptr);
+    }
 }
 
 static void load_init_table(void* tempBuffer, uint8_t index)
@@ -373,6 +391,8 @@ void onAttach()
     interop::writeJmp(0x004DE650, load_init_table_2);
     interop::writeJmp(0x00505B20, load_init_table_3);
     interop::writeJmp(0x004B2A90, rnd);
+    interop::writeJmp(0x0050AA10, &operator_delete);
+    interop::writeJmp(0x0050AA00, &operator_new);
 
     door_init_hooks();
     scd_init_hooks();

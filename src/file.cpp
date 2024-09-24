@@ -77,9 +77,27 @@ namespace openre::file
         return bytesRead;
     }
 
+    // 0x00441630
+    static void* file_alloc(const size_t size)
+    {
+        if (gGameTable.dword_67C9D0)
+        {
+            operator_delete(&gGameTable.dword_67C9D0);
+            gGameTable.dword_67C9D0 = 0;
+        }
+
+        if (!size)
+        {
+            return 0;
+        }
+        auto res = operator_new(size);
+        gGameTable.dword_67C9D0 = size;
+        return res;
+    }
+
     void file_init_hooks()
     {
-
         interop::writeJmp(0x004DD360, &osp_read);
+        interop::writeJmp(0x00441630, &file_alloc);
     }
 }

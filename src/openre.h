@@ -174,4 +174,7 @@ namespace openre
         auto remainder = iValue & mask;
         return (T)(remainder == 0 ? iValue : iValue + a - remainder);
     }
+
+    void operator_delete(void* ptr);
+    void* operator_new(const size_t size);
 }
