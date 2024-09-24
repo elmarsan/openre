@@ -362,6 +362,8 @@ static void load_init_table_3()
 
 void snd_se_walk(int, int, PlayerEntity* pEm) {}
 
+static void break_everything() {}
+
 void onAttach()
 {
     // interop::writeJmp(0x004DE7B0, &sub_4DE7B0);
@@ -384,6 +386,31 @@ void onAttach()
     enemy_init_hooks();
     file_init_hooks();
     math_init_hooks();
+
+    // 0x56040000: RVA Relative Virtual Address
+    HMODULE hModule = GetModuleHandleA("ddraw.dll");
+    printf("Base address: %p\n", hModule);
+    printf("Base address (hex): 0x%llx\n", (unsigned long long)hModule);
+    // 54180000 - 5426B000 [95868]
+
+    // 0x100711D0    //
+    
+
+    // 0x100658C0
+
+    // interop::writeJmp(0x711D0 + 0x54180000, &break_everything);
+    //auto res = LoadLibraryExA("ddraw.dll", NULL, NULL);
+    //if (!res)
+    //{
+    //    printf("%s\n", "Unable to load dll");
+    //}
+
+    //int32_t ddrawDllMain = 0x000648C0;
+
+    //// 0x100658C0 - 0x10001000
+
+    //interop::writeJmp(0x56070000 + 0x000648C0, &break_everything);
+    //interop::writeJmp(0x100658C0 - 0x56070000, &break_everything);
 }
 
 extern "C" {
