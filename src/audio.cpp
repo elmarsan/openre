@@ -16,12 +16,9 @@ namespace openre::audio
         auto entry = &gGameTable.byte_53C5D8[index];
         switch (kind)
         {
-        case 0:
-            return entry->main;
-        case 1:
-            return entry->sub0;
-        case 2:
-            return entry->sub1;
+        case 0: return entry->main;
+        case 1: return entry->sub0;
+        case 2: return entry->sub1;
         }
         return 0;
     }
@@ -154,7 +151,8 @@ namespace openre::audio
 
         gGameTable.dword_6934B4 = gGameTable.byte_6D730C + unk1;
         std::memcpy(gGameTable.byte_6D730C, (void*)buffer, unk2);
-        gGameTable.dword_693C4C = *(int*)(gGameTable.dword_6934B4 + 12) + (uint32_t) * (uint16_t*)(gGameTable.dword_6934B4 + 18) * -0x200 - 0xA20;
+        gGameTable.dword_693C4C
+            = *(int*)(gGameTable.dword_6934B4 + 12) + (uint32_t) * (uint16_t*)(gGameTable.dword_6934B4 + 18) * -0x200 - 0xA20;
         if (gGameTable.dword_693C4C < 0x38801)
         {
             auto id = ss_load_banks(5, gGameTable.current_stage, gGameTable.current_room, bgmIndex);
@@ -211,7 +209,6 @@ namespace openre::audio
         p(a0, a1);
     }
 
-
     void snd_se_on(int a0, const Vec32& a1)
     {
         snd_se_on(a0, &a1);
@@ -220,6 +217,35 @@ namespace openre::audio
     void snd_se_on(int a0)
     {
         snd_se_on(a0, nullptr);
+    }
+
+    // 0x004EC450
+    void snd_load_core(int a1, int a2)
+    {
+        interop::call<void, int, int>(0x004EC450, a1, a2);
+    }
+
+    // 0x004EC7D0
+    void snd_room_load()
+    {
+        interop::call<void>(0x004EC7D0);
+    }
+
+    // 0x004ECCE0
+    void snd_bgm_play_ck()
+    {
+        interop::call<void>(0x004ECCE0);
+    }
+    // 0x004EC8A0
+    void snd_load_em()
+    {
+        interop::call<void>(0x004EC8A0);
+    }
+
+    // 0x004EC9C0
+    void snd_bgm_set()
+    {
+        interop::call<void>(0x004EC9C0);
     }
 
     void bgm_init_hooks()

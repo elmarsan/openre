@@ -426,6 +426,7 @@ declare     enabled                 u16
 
 struct      GameTable
 declare     enable_dsound           bool                    0x00524EB6
+declare     graphics_ptr_data       u8                      0x00524EB9
 declare     global_prj              s32                     0x00526268
 declare     math_const_table        s16[1224]               0x00526270
 declare     pGG                     void*                   0x0052C4B0
@@ -435,6 +436,7 @@ declare     byte_53C5D8             BgmTableEntry[146]      0x0053C5D8
 declare     byte_53C78F             u8[70]                  0x0053C78F
 declare     byte_53DB74             u8*                     0x0053DB74
 declare     dword_66D394            u32                     0x0066D394
+declare     dword_67C9D0            u32                     0x0067C9D0
 declare     input_mapping           u8[31]                  0x0067CA30
 declare     dword_67CA54            u32                     0x0067CA54
 declare     dword_67CC28            u32                     0x0067CC28
@@ -449,7 +451,16 @@ declare     dword_6893F0            u32                     0x006893F0
 declare     door_state              u32                     0x006893F4
 declare     door                    DoorInfo*               0x00689400
 declare     idd                     u32                     0x00689790
+declare     stage_bk                u8                      0x00689849
 declare     dword_689BDC            u32                     0x00689BDC
+declare     rdt_nCount              u32                     0x00689C10
+declare     rdt_top_ptr             void*                   0x00689C14
+declare     rdt_size                u32                     0x00689C18
+declare     dword_689C1C            u16                     0x00689C1C
+declare     room_path               char[32]                0x00689C20
+declare     stage_font_name         char[32]                0x00689C40
+declare     pEm                     PlayerEntity*           0x00689C60
+declare     byte_689C64             u8                      0x00689C64
 declare     dword_689DF8            u32                     0x00689DF8
 declare     ctcb                    Unknown68A204*          0x0068A204
 declare     _st                     u8                      0x00691F61
@@ -458,6 +469,7 @@ declare     byte_691F63             u8                      0x00691F63
 declare     byte_691F6C             u8                      0x00691F6C
 declare     byte_691F70             u8                      0x00691F70
 declare     byte_691F76             u8                      0x00691F76
+declare     byte_691F7B             u8                      0x00691F7B
 declare     itembox_slot_id         u8                      0x00691F84
 declare     byte_691F85             u8                      0x00691F85
 declare     word_691FB0             u16                     0x00691FB0
@@ -512,7 +524,9 @@ declare     g_key                   u32                     0x00988604
 declare     key_trg                 u32                     0x00988608
 declare     dword_988610            u32                     0x00988610
 declare     rdt                     Rdt*                    0x0098861C
+declare     dword_988620            u32                     0x00988620
 declare     mem_top                 void*                   0x00988624
+declare     dword_988628            u32                     0x00988628
 declare     dword_98862C            void*                   0x0098862C
 declare     vcut_data               VCut*[2]                0x00988630
 declare     em_damage_table_16      void*[48]               0x00988638
@@ -520,7 +534,9 @@ declare     em_die_table            void*[84]               0x009886F8
 declare     door_aot_data           void*                   0x00988848
 declare     aot_table               void*[32]               0x00988850
 declare     dword_9888D8            u16                     0x009888D8
+declare     fg_rbj_set              u8                      0x00989E68
 declare     fg_system               u32                     0x00989E6C
+declare     byte_989E7D             u8                      0x00989E7D
 declare     fg_status               u32                     0x00989ED0
 declare     fg_stop                 u32                     0x00989ED4
 declare     fg_use                  u32                     0x00989ED8
@@ -543,8 +559,13 @@ declare     enemy_init_table        void*[192]              0x0098A2D4
 declare     enemy_init_entries      EnemyInitEntry[2]       0x0098A614
 declare     pOm                     ObjectEntity            0x0098A61C
 declare     aot_count               u8                      0x0098E528
+declare     unknown_98E544          void*                   0x0098E544
+declare     dword_98E798            u32                     0x0098E798
 declare     table_start             u8                      0x0098E79C
 declare     inventory_size          u8                      0x0098E9A4
+declare     byte_98E9AB             u8                      0x0098E9AB
+declare     word_98E9AC             s16                     0x0098E9AC
+declare     word_98E9B6             u16                     0x0098E9B6
 declare     num_saves               u16                     0x0098E9BC
 declare     bgm_table               u16[142]                0x0098E9C8
 declare     scd_variables_00        u16                     0x0098EAE4
@@ -586,6 +607,7 @@ declare     fade_table              Fade[4]                 0x0098F07C
 declare     byte_98F98F             u8[4]                   0x0098F98F
 declare     byte_991F80             u8                      0x00991F80
 declare     dword_991FC4            u32                     0x00991FC4
+declare     byte_99270F             u8                      0x0099270F
 declare     doors                   DoorEntity*[9]          0x0099CEA0
 declare     dword_99CEC4            u32                     0x0099CEC4
 declare     dword_99CF64            u32                     0x0099CF64

@@ -94,6 +94,11 @@ namespace openre::file
         gGameTable.dword_67C9D0 = size;
         return res;
     }
+    // 0x0043C590
+    static int load_adt(const char* path, uint32_t* bufferSize, int mode)
+    {
+        return interop::call<int, const char*, uint32_t*, int>(0x0043C590, path, bufferSize, mode);
+    }
 
     void file_init_hooks()
     {

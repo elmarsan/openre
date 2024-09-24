@@ -447,6 +447,12 @@ namespace openre::enemy
         interop::call<void, uint8_t, void*>(0x004EDE30, id, enemy);
     }
 
+    // 0x004DF180
+    void em_init_move()
+    {
+        interop::call<void>(0x004DF180);
+    }
+
     // part of 0x004E77D0
     bool spawn_enemy(const EnemySpawnInfo& info)
     {

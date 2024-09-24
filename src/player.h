@@ -44,7 +44,8 @@ namespace openre::player
 
     int inventory_find_item(ItemType type);
     void player_init_hooks();
-
+    void player_move(PlayerEntity* player);
     bool is_aiming();
     void set_routine(Routine routine);
+    void player_set(PlayerEntity* player);
 }
