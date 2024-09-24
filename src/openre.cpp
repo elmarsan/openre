@@ -13,6 +13,7 @@
 #include "player.h"
 #include "rdt.h"
 #include "re2.h"
+#include "room.h"
 #include "scd.h"
 #include "sce.h"
 #include <cstring>
@@ -31,6 +32,7 @@ using namespace openre::scd;
 using namespace openre::sce;
 using namespace openre::input;
 using namespace openre::camera;
+using namespace openre::room;
 
 namespace openre
 {
@@ -383,6 +385,7 @@ void onAttach()
     enemy_init_hooks();
     file_init_hooks();
     math_init_hooks();
+    init_room_hooks();
 }
 
 extern "C" {
