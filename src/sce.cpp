@@ -556,6 +556,12 @@ namespace openre::sce
         dword_98E794 = &sce_itembox_callback;
     }
 
+    // 0x004E3C20
+    void sce_model_init()
+    {
+        interop::call<void>(0x004E3C20);
+    }
+
     static void set_sce_hook(SceKind sce, SceImpl impl)
     {
         gScdImplTable[sce] = impl;

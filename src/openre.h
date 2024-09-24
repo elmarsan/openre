@@ -150,6 +150,8 @@ namespace openre
     extern uint16_t& gPoisonStatus;
     extern uint8_t& gPoisonTimer;
 
+    static const char* gStageSymbols = "123456789abcdefg";
+
     void task_sleep(int frames);
     void task_exit();
     void mess_print(int x, int y, const uint8_t* str, short a4);
@@ -160,6 +162,9 @@ namespace openre
     void set_geom_screen(int prj);
     bool check_flag(FlagGroup group, uint32_t index);
     void set_flag(FlagGroup group, uint32_t index, bool value);
+    void sub_4450C0(int a1);
+    uint8_t get_player_num();
+    void set_registry_flag(int index, int sub);
 
     void* work_alloc(size_t len);
     template<typename T> static T* work_alloc()

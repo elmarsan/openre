@@ -971,4 +971,10 @@ namespace openre::player
             check_flag(FlagGroup::Status, FG_STATUS_GAMEPLAY) && check_flag(FlagGroup::Status, FG_STATUS_25)
             && check_flag(FlagGroup::Status, FG_STATUS_24) && !check_flag(FlagGroup::Status, FG_STATUS_SCREEN));
     }
+
+    // 0x004D93A0
+    void player_set(PlayerEntity* player)
+    {        
+        interop::call<void, PlayerEntity*>(0x004D93A0, player);
+    }
 }

@@ -50,8 +50,7 @@ namespace openre
     Unknown68A204*& dword_68A204 = *((Unknown68A204**)0x68A204);
 
     static uint8_t* _ospBuffer = (uint8_t*)0x698840;
-    static char* _rdtPathBuffer = (char*)0x689C20;
-    static const char* _stageSymbols = "123456789abcdefg";
+    static char* _rdtPathBuffer = (char*)0x689C20;    
 
     static uint8_t& _graphicsPtr = *((uint8_t*)0x524EB9);
     static uint8_t& _ospMaskFlag = *((uint8_t*)0x6998C0);
@@ -92,16 +91,8 @@ namespace openre
 
     static void get_rdt_path(char* buffer, uint8_t player, uint8_t stage, uint8_t room)
     {
-        auto stageSym = _stageSymbols[(dword_98E798 & 0xFF) + gCurrentStage];
+        auto stageSym = gStageSymbols[(dword_98E798 & 0xFF) + gCurrentStage];
         std::sprintf(buffer, "Pl%d\\Rdt\\room%c%02x%d.rdt", player, stageSym, room, player);
-    }
-
-    // 0x004EC9C0
-    static void snd_bgm_set()
-    {
-        using sig = void (*)();
-        auto p = (sig)0x004EC9C0;
-        p();
     }
 
     // 0x004450C0
@@ -341,10 +332,22 @@ namespace openre
         return malloc(size);
     }
 
+    // 0x004450C0
+    void sub_4450C0(int a1)
+    {
+        interop::call<int>(0x004450C0);
+    }
+
     // 0x0050AA10
     void operator_delete(void* ptr)
     {
         free_(ptr);
+    }
+
+    // 0x00442EA0
+    void set_registry_flag(int index, int sub)
+    {
+        interop::call<void, int, int>(0x00442EA0, index, sub);
     }
 }
 
