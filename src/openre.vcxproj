@@ -88,6 +88,7 @@
     <ClCompile Include="openre.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="rdt.cpp" />
+    <ClCompile Include="room.cpp" />
     <ClCompile Include="scd.cpp" />
     <ClCompile Include="sce.cpp" />
   </ItemGroup>
@@ -110,6 +111,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="rdt.h" />
     <ClInclude Include="re2.h" />
+    <ClInclude Include="room.h" />
     <ClInclude Include="scd.h" />
     <ClInclude Include="sce.h" />
   </ItemGroup>
