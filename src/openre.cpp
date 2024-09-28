@@ -46,8 +46,7 @@ namespace openre
     PlayerEntity& gPlayerEntity = *((PlayerEntity*)0x00989EF0);
     uint16_t& gPoisonStatus = *((uint16_t*)0x0098A108);
     uint8_t& gPoisonTimer = *((uint8_t*)0x0098A10A);
-    uint32_t& _memTop = *((uint32_t*)0x988624);
-    Unknown68A204*& dword_68A204 = *((Unknown68A204**)0x68A204);
+    uint32_t& _memTop = *((uint32_t*)0x988624);    
 
     static uint8_t* _ospBuffer = (uint8_t*)0x698840;
     static char* _rdtPathBuffer = (char*)0x689C20;    
@@ -84,7 +83,7 @@ namespace openre
     static uint8_t& byte_989E7E = *((uint8_t*)0x989E7E);
 
     // 0x00509C90
-    static uint8_t get_player_num()
+    uint8_t get_player_num()
     {
         return check_flag(FlagGroup::Status, FG_STATUS_PLAYER) ? 1 : 0;
     }
@@ -162,7 +161,7 @@ namespace openre
     {
         while (true)
         {
-            switch (dword_68A204->var_0D)
+            switch (gGameTable.ctcb->var_0D)
             {
             case 0:
             {
@@ -188,20 +187,20 @@ namespace openre
                     _em->status_flg &= 0xF9FF;
                     _memTop = dword_988620;
                     dword_98861C = dword_988620;
-                    dword_68A204->var_0D = 10;
+                    gGameTable.ctcb->var_0D = 10;
                     break;
                 }
                 break;
             }
             case 2:
-                dword_68A204->var_0D = 3;
+                gGameTable.ctcb->var_0D = 3;
                 byte_99270F = 0;
                 task_sleep(1);
                 break;
             case 3:
                 if (gCurrentStage == byte_989E7D)
                 {
-                    dword_68A204->var_0D = 5;
+                    gGameTable.ctcb->var_0D = 5;
                 }
                 else
                 {
@@ -220,7 +219,7 @@ namespace openre
                 break;
             case 10:
                 snd_bgm_set();
-                if (dword_68A204->var_13 == 0)
+                if (gGameTable.ctcb->var_13 == 0)
                 {
                     sub_4450C0();
                     dword_98862C = 0x0098A114;
@@ -241,7 +240,7 @@ namespace openre
                     }
                     if (_em->id == word_98EB24)
                     {
-                        dword_68A204->var_0D = 2;
+                        gGameTable.ctcb->var_0D = 2;
                     }
                     else
                     {

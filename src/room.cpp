@@ -13,6 +13,7 @@
 #include "sce.h"
 #include <cstdint>
 #include <cstring>
+#include <windows.h>
 
 using namespace openre;
 using namespace openre::audio;
@@ -79,6 +80,12 @@ namespace openre::room
         interop::call<void, int>(0x00502190, a1);
     }
 
+    // 0x0043DF40
+    static void sub_43DF40()
+    {
+        interop::call<void>(0x0043DF40);
+    }
+
     // 0x004DE7B0
     static void set_room()
     {
@@ -88,11 +95,14 @@ namespace openre::room
         {
             switch (gGameTable.ctcb->var_0D)
             {
+                // WHEN IT ENDS JUMP DIRECTLY TOO CASE 1
+                // BEFORE_OPEN_DOOR
+                // 0x4DE700
             case 0:
             {
                 strcpy(gGameTable.room_path, "Pl0\\Rdt\\room1000.rdt");
                 static const char* font1 = "common\\data\\font1.tim";
-                static const char* font2 = "common\\data\\font1.adt";                
+                static const char* font2 = "common\\data\\font1.adt";
 
                 if (gGameTable.graphics_ptr_data == 1)
                 {
@@ -109,11 +119,13 @@ namespace openre::room
                     ++gGameTable.room_path[2];
                     ++gGameTable.room_path[15];
                 }
+                // Wrong ???
+                // Check subscript operator is less than size(gStageSymbols) - 1
                 gGameTable.room_path[12] = gStageSymbols[(gGameTable.dword_98E798 & 0xFF) + gGameTable.current_stage];
                 gGameTable.room_path[13] += gGameTable.current_room / 16;
 
                 const auto mod = gGameTable.current_room % 16;
-                if (mod)
+                if (mod >= 10)
                 {
                     gGameTable.room_path[14] = mod + 87;
                 }
@@ -121,17 +133,15 @@ namespace openre::room
                 {
                     gGameTable.room_path[14] = mod + 48;
                 }
-                // if (get_player_num() == 1)
-                //{
-                //     ++gGameTable.room_path[15];
-                // }
+                // room_path[2, 12, 13, 14 15] Maybe different if claire
+                // room_path[12, 13,14] Maybe different if leon
                 switch (gGameTable.current_stage)
                 {
                 case 0:
                 {
-                    if (gGameTable.current_room == 2)
+                    if (gGameTable.current_room == 22)
                     {
-                        set_registry_flag(0, 48);
+                        set_registry_flag(0, 56);
                     }
                     break;
                 }
@@ -171,6 +181,7 @@ namespace openre::room
                     }
                     case 11:
                     {
+                        // CHECK: it execute case 27
                         set_registry_flag(0, 55);
                         [[fallthrough]];
                     }
@@ -208,30 +219,38 @@ namespace openre::room
                 }
                 default: break;
                 }
-
-                gGameTable.dword_98E798 = 0;
+                gGameTable.word_98E78C = 0;
+                // TODO: Check what is this
                 gGameTable.fg_rbj_set = 0;
-                // fg_status &= 0xFFF04000;
+                // TODO: set using set_flag()
+                gGameTable.fg_status &= 0xFFF04000;
                 gGameTable.pEm->pOn_om = 0;
-                gGameTable.pEm->status_flg = (gGameTable.pEm->status_flg & 0xF9 << 16 | gGameTable.pEm->status_flg & 0xff);
+                // TODO: DEBUG this
+                gGameTable.pEm->status_flg = (gGameTable.pEm->status_flg & 0x00FF) | (0xF9 << 8);
                 gGameTable.mem_top = reinterpret_cast<void*>(gGameTable.dword_988620);
                 gGameTable.rdt = reinterpret_cast<Rdt*>(gGameTable.dword_988620);
                 gGameTable.ctcb->var_0D = 10;
                 goto LABEL_35;
             }
+            // PLAY_DOOR_ANIMATION
+            // 0x4DE8BF
             case 1:
             {
                 goto LABEL_62;
             }
+            //  END_DOOR_ANIMATION
+            // COMES AFTER PLAY_DOOR_ANIMATION, also if you press key to skip door animation         
+            // 0X4DEBAC
             case 2:
             {
                 goto LABEL_63;
             }
+            // TODO: Name and figure out when triggers, what does, etc..
             case 3:
             {
                 if (gGameTable.current_stage == gGameTable.byte_989E7D)
                 {
-                    dword_68A204->var_0D = 5;
+                    gGameTable.ctcb->var_0D = 5;
                     goto LABEL_44;
                 }
 
@@ -266,16 +285,27 @@ namespace openre::room
                     }
                     break;
                 }
-                }
-                tim_buffer_to_surface(reinterpret_cast<uint32_t*>(fBuff), 9, 1);
-                file_alloc(0);
-                gGameTable.stage_bk = gGameTable.byte_989E7D;
+                default:
+                {
+                    tim_buffer_to_surface(reinterpret_cast<uint32_t*>(fBuff), 9, 1);
+                    file_alloc(0);
+                    gGameTable.stage_bk = gGameTable.byte_989E7D;
 
-                gGameTable.ctcb->var_0D = 4;
-                task_sleep(1);
-                return;
+                    gGameTable.ctcb->var_0D = 4;
+                    task_sleep(1);
+                    return;
+                }
+                }
+                // tim_buffer_to_surface(reinterpret_cast<uint32_t*>(fBuff), 9, 1);
+                // file_alloc(0);
+                // gGameTable.stage_bk = gGameTable.byte_989E7D;
+
+                // gGameTable.ctcb->var_0D = 4;
+                // task_sleep(1);
+                // return;
             }
-            case 4: [[fallthrough]];
+            // case 4: [[fallthrough]];
+            case 4:
             case 5:
             {
                 gGameTable.word_989EE8 = 3333;
@@ -288,7 +318,14 @@ namespace openre::room
                     return;
                 }
 
-                gGameTable.rdt_top_ptr = rdt_get_offset<void*>(RdtOffsetKind::EDT);
+                // TODO: Check this
+                for (uint32_t i = 0; i < 23; i++)
+                {
+                    if (gGameTable.rdt->offsets[i] != nullptr)
+                    {
+                        gGameTable.rdt_top_ptr = gGameTable.rdt->offsets[i];
+                    }
+                }
                 // do
                 //{
                 //     if (*rdtOffset)
@@ -389,7 +426,8 @@ namespace openre::room
 
                 gGameTable.dword_98862C = gGameTable.enemies[0];
                 gGameTable.enemy_count = 0;
-                std::memset(gGameTable.splayer_work, reinterpret_cast<int>(gGameTable.unknown_98E544), 33);
+                std::memset(&gGameTable.splayer_work, reinterpret_cast<int>(gGameTable.unknown_98E544), 33);
+                // TODO: Check if we can get rid of this loop
                 i = 33;
                 j = i;
                 do
@@ -398,7 +436,13 @@ namespace openre::room
                     --j;
                 } while (j);
                 gGameTable.rdt_nCount = 0;
+                gGameTable.enemy_init_entries[0].enabled = 0;
+                gGameTable.enemy_init_entries[1].enabled = 0;
+                sub_43DF40();
                 i = 32;
+                // gGameTable.dword_98EB1C = reinterpret_cast<uint16_t>(&gGameTable.pOm);
+                gGameTable.word_98EB1C = gGameTable.pOm.sca_info;
+                gGameTable.rdt_nCount = 32;
                 do
                 {
                     --i;
@@ -408,7 +452,7 @@ namespace openre::room
                 {
                     gGameTable.ctcb->var_0D = 2;
                 LABEL_44:
-                    if (dword_68A204->var_0D > 10)
+                    if (gGameTable.ctcb->var_0D > 10)
                     {
                         return;
                     }
@@ -435,11 +479,12 @@ namespace openre::room
                         }
                     }
                 }
-                gGameTable.dword_689BDC = gGameTable.pEm->id & 0xff;
+                gGameTable.dword_689BDC = gGameTable.pEm->id;
                 gGameTable.pEm->id = gGameTable.next_pld & 0xff;
                 st_chenge_pl(gGameTable.next_pld);
                 player_set(gGameTable.pEm);
-                if (!dword_68A204->var_13)
+                // TODO: Debug this poisoned and low health
+                if (!gGameTable.ctcb->var_13)
                 {
                     gGameTable.pEm->routine_0 = 0;
                     gGameTable.pEm->routine_1 = 0;
@@ -467,13 +512,17 @@ namespace openre::room
                     gGameTable.byte_691F7B = 1;
                     gGameTable.ctcb->var_0D = 1;
 
+                // TODO: Check jump from case 1: 229
                 LABEL_62:
                     snd_load_core(gGameTable.next_pld, 1);
-                    if (dword_68A204->var_13 == 0)
+                    if (gGameTable.ctcb->var_13 == 0)
                     {
+                        // TODO: Check jump from case 2: 233
                     LABEL_63:
+                        // TODO: What is this?
                         gGameTable.byte_99270F = 0;
-                        dword_68A204->var_13 = 3;
+                        // TODO: Move to game table and figure out what is it.
+                        gGameTable.ctcb->var_13 = 3;
                         task_sleep(1);
                     }
                 }
@@ -497,5 +546,6 @@ namespace openre::room
     void init_room_hooks()
     {
         interop::writeJmp(0x005033C0, &get_room_id);
+        //interop::writeJmp(0x004DE7B0, &set_room);
     }
 };
