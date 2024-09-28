@@ -121,7 +121,7 @@ namespace openre::enemy
 
     // 0x004B1DD0
     static void em_move_tbl_set()
-    {
+    {        
         gGameTable.enemy_init_entries[0].type = EM_NONE;
         gGameTable.enemy_init_entries[1].type = EM_NONE;
 

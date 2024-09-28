@@ -88,6 +88,16 @@ struct VCut
 };
 static_assert(sizeof(VCut) == 0x14);
 
+struct RID
+{
+    uint16_t end_flg;                   // 0x0000
+    uint16_t fov;                       // 0x0002
+    Vec32 eye_pos;                      // 0x0004
+    Vec32 at_pos;                       // 0x0010
+    uint32_t sprite_ptr;                // 0x001C
+};
+static_assert(sizeof(RID) == 0x20);
+
 struct TmdEntry;
 
 struct Edd;
@@ -739,11 +749,15 @@ struct GameTable
     uint8_t pad_98A5D4[64];             // 0x98A5D4
     EnemyInitEntry enemy_init_entries[2];// 0x98A614
     ObjectEntity pOm;                   // 0x98A61C
-    uint8_t pad_98A814[15636];          // 0x98A814
+    uint8_t pad_98A814[15624];          // 0x98A814
+    uint32_t dword_98E51C;              // 0x98E51C
+    uint8_t pad_98E520[8];              // 0x98E520
     uint8_t aot_count;                  // 0x98E528
     uint8_t pad_98E529[27];             // 0x98E529
     void* unknown_98E544;               // 0x98E544
-    uint8_t pad_98E548[592];            // 0x98E548
+    uint8_t pad_98E548[580];            // 0x98E548
+    int16_t word_98E78C;                // 0x98E78C
+    uint8_t pad_98E78E[10];             // 0x98E78E
     uint32_t dword_98E798;              // 0x98E798
     uint8_t table_start;                // 0x98E79C
     uint8_t pad_98E79D[519];            // 0x98E79D

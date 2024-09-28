@@ -57,6 +57,13 @@ declare     fCut                    u8
 declare     tCut                    u8
 declare     xz                      u16[8]
 
+struct      RID
+declare     end_flg                 u16
+declare     fov                     u16
+declare     eye_pos                 Vec32
+declare     at_pos                  Vec32
+declare     sprite_ptr              u32
+
 struct      TmdEntry
 struct      Edd
 struct      Emr
@@ -558,8 +565,10 @@ declare     enemy_init_map          void*[96]               0x0098A154
 declare     enemy_init_table        void*[192]              0x0098A2D4
 declare     enemy_init_entries      EnemyInitEntry[2]       0x0098A614
 declare     pOm                     ObjectEntity            0x0098A61C
+declare     dword_98E51C            u32                     0x0098E51C
 declare     aot_count               u8                      0x0098E528
 declare     unknown_98E544          void*                   0x0098E544
+declare     word_98E78C             s16                     0x0098E78C
 declare     dword_98E798            u32                     0x0098E798
 declare     table_start             u8                      0x0098E79C
 declare     inventory_size          u8                      0x0098E9A4

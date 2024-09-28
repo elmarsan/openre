@@ -60,7 +60,7 @@ namespace openre::file
     }
 
     // 0x004DD360
-    static int osp_read()
+    int osp_read()
     {
         const char* ospFilepath = "common\\bin\\osp.bin";
 
@@ -78,7 +78,7 @@ namespace openre::file
     }
 
     // 0x00441630
-    static void* file_alloc(const size_t size)
+    void* file_alloc(const size_t size)
     {
         if (gGameTable.dword_67C9D0)
         {
@@ -95,7 +95,7 @@ namespace openre::file
         return res;
     }
     // 0x0043C590
-    static int load_adt(const char* path, uint32_t* bufferSize, int mode)
+    int load_adt(const char* path, uint32_t* bufferSize, int mode)
     {
         return interop::call<int, const char*, uint32_t*, int>(0x0043C590, path, bufferSize, mode);
     }
