@@ -11,6 +11,7 @@
 #include "player.h"
 #include "rdt.h"
 #include "sce.h"
+#include <iostream>
 #include <cstdint>
 #include <cstring>
 #include <windows.h>
@@ -239,7 +240,7 @@ namespace openre::room
                 goto LABEL_62;
             }
             //  END_DOOR_ANIMATION
-            // COMES AFTER PLAY_DOOR_ANIMATION, also if you press key to skip door animation         
+            // COMES AFTER PLAY_DOOR_ANIMATION, also if you press key to skip door animation
             // 0X4DEBAC
             case 2:
             {
@@ -543,9 +544,97 @@ namespace openre::room
         return id;
     }
 
+    // using SetDoorFunc = void (*)();
+    // static SetDoorFunc* gSetDoorTable = (SetDoorFunc*)0x004DEE80;
+
+    // scd table: 0x53AE10
+
+    static void set_room_2()
+    {
+        gGameTable.byte_99270F = 0;
+        gGameTable.ctcb->var_0D = 3;
+        task_sleep(1);
+    }
+
+    static void set_room_test()
+    {
+        while (true)
+        {
+            switch (gGameTable.ctcb->var_0D)
+            {
+            case 0: interop::call(0x004DE7D0);
+            case 1: interop::call(0x004DEB8D);
+            case 2: interop::call(0x004DEBAC);
+            case 3: interop::call(0x004DEA1D);
+            case 4: interop::call(0x004DEC7D);
+            case 5: interop::call(0x004DEC7D);
+            case 6: interop::call(0x004DEDA5);
+            case 7: interop::call(0x004DEE0A);
+            case 8: interop::call(0x004DEE2D);
+            case 9: interop::call(0x004DEE51);
+            case 10: interop::call(0x004DE980);
+            default:
+                return;
+
+                // case 0: gSetDoorTable[0](); break;
+                // case 1: gSetDoorTable[1](); break;
+                // case 2: gSetDoorTable[2](); break;
+                // case 3: gSetDoorTable[3](); break;
+                // case 4: gSetDoorTable[4](); break;
+                // case 5: gSetDoorTable[5](); break;
+                // case 6: gSetDoorTable[6](); break;
+                // case 7: gSetDoorTable[7](); break;
+                // case 8: gSetDoorTable[8](); break;
+                // case 9: gSetDoorTable[9](); break;
+                // case 10: gSetDoorTable[10](); break;
+            }
+        }
+    }
+
+    void loc_4DE7D0() {}
+    void loc_4DEB8D() {}
+    static void loc_4DEBAC()
+    {                
+        // interop::call(0x4DEBAC);        
+        gGameTable.byte_99270F = 0;
+        gGameTable.ctcb->var_0D = 3;
+        task_sleep(1);
+    }
+    void loc_4DEA1D() {}
+    void loc_4DEC7D() {}
+    void loc_4DEDA5() {}
+    void loc_4DEE0A() {}
+    void loc_4DEE2D() {}
+    void loc_4DEE51() {}
+    void loc_4DE980() {}
+
+    // Define the function pointer type
+    using SetDoorFunc = void (*)();
+    static SetDoorFunc* gSetDoorTable = (SetDoorFunc*)0x004DEE80;
+
     void init_room_hooks()
     {
+        SetDoorFunc* gSetDoorTable = (SetDoorFunc*)0x004DEE80;
+        void (*newSetDoorTable[11])();
+        std::memcpy(newSetDoorTable, gSetDoorTable, 11 * 4);        
+        newSetDoorTable[2] = loc_4DEBAC;        
+        interop::writeMemory(0x004DEE80, newSetDoorTable, 11 * 4);
+        gSetDoorTable = newSetDoorTable;
+
+        // Not working error with registers
+        // gSetDoorTable[2] = loc_4DEBAC;        
+
+        // 0x004DEBB4
+        // gSetDoorTable[2] = loc_4DEBAC;
+        // interop::writeMemory(0x004DEBAC, loc_4DEBAC, 4);
+
+        // gGameTable.set_room_tbl[2] = set_room_2;
+        // gSetDoorTable[2] = set_room_2;
+        // interop::writeJmp(0x004DE7B0, &set_room_test);
+
+        // interop::writeJmp(0x004DE7B0, &set_room_test);
+
         interop::writeJmp(0x005033C0, &get_room_id);
-        //interop::writeJmp(0x004DE7B0, &set_room);
+        // interop::writeJmp(0x004DE7B0, &set_room);
     }
 };
