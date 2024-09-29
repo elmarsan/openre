@@ -432,6 +432,7 @@ declare     type                    u16
 declare     enabled                 u16
 
 struct      GameTable
+declare     set_room_tbl            void*[11]               0x004DEE80
 declare     enable_dsound           bool                    0x00524EB6
 declare     graphics_ptr_data       u8                      0x00524EB9
 declare     global_prj              s32                     0x00526268

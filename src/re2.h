@@ -546,7 +546,9 @@ static_assert(sizeof(EnemyInitEntry) == 0x04);
 
 struct GameTable
 {
-    uint8_t pad_0000[5394102];          // 0x0000
+    uint8_t pad_0000[5107328];          // 0x0000
+    void* set_room_tbl[11];             // 0x4DEE80
+    uint8_t pad_4DEEAC[286730];         // 0x4DEEAC
     bool enable_dsound;                 // 0x524EB6
     uint8_t pad_524EB7[2];              // 0x524EB7
     uint8_t graphics_ptr_data;          // 0x524EB9
