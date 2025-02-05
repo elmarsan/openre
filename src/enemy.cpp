@@ -85,8 +85,6 @@ namespace openre::enemy
         }
     };
 #pragma pack(pop)
-
-    static void em_zombie(EnemyEntity* enemy);
     static void em_21(EnemyEntity* enemy);
     static void em_22(EnemyEntity* enemy);
     static void em_23(EnemyEntity* enemy);
@@ -447,6 +445,12 @@ namespace openre::enemy
         interop::call<void, uint8_t, void*>(0x004EDE30, id, enemy);
     }
 
+    // 0x004B2AD0
+    void em_seq_sound(EnemyEntity* enemy)
+    {
+        interop::call<void, EnemyEntity*>(0x004B2AD0, enemy);
+    }
+
     // part of 0x004E77D0
     bool spawn_enemy(const EnemySpawnInfo& info)
     {
@@ -598,12 +602,6 @@ namespace openre::enemy
             em->neck_flg = 0x92;
 
         return true;
-    }
-
-    // 0x004517F0
-    static void em_zombie(EnemyEntity* enemy)
-    {
-        ((EnemyFunc)0x004517F0)(enemy);
     }
 
     // 0x0045FC10

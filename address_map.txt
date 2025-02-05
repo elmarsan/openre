@@ -271,6 +271,8 @@ struct      EnemyEntity
 base        ActorEntity
 declare     var_218                 u8          0x218
 declare     var_219                 u8          0x219
+declare     var_21A                 u8          0x21A
+declare     var_21B                 u8          0x21B
 declare     var_21C                 u8          0x21C
 declare     var_21D                 u8          0x21D
 declare     var_21E                 u8          0x21E
@@ -280,6 +282,10 @@ declare     var_221                 u8          0x221
 declare     var_222                 u8          0x222
 declare     var_223                 u8          0x223
 declare     var_227                 u8          0x227
+declare     var_228                 u8          0x228
+declare     var_229                 u8          0x229
+declare     var_22A                 u8          0x22A
+declare     var_22B                 u8          0x22B
 declare     var_22C                 u8          0x22C
 declare     var_22D                 u8          0x22D
 declare     var_22E                 u8          0x22E
@@ -288,9 +294,13 @@ declare     var_232                 u8          0x232
 declare     var_233                 u8          0x233
 declare     var_234                 u8          0x234
 declare     var_235                 u8          0x235
+declare     var_236                 u8          0x236
+declare     var_237                 u8          0x237
+declare     var_239                 u8          0x239
 declare     var_23A                 s8          0x23A
 declare     var_23C                 u8          0x23C
 declare     var_23D                 u8          0x23D
+declare     var_23E                 u8          0x23E
 declare     var_23F                 u8          0x23F
 declare     pad_247                 u8          0x247
 
@@ -606,6 +616,7 @@ declare     byte_98E541             u8                      0x0098E541
 declare     dword_98E790            u32                     0x0098E790
 declare     table_start             u8                      0x0098E79C
 declare     inventory_size          u8                      0x0098E9A4
+declare     word_98E9B8             u16                     0x0098E9B8
 declare     num_saves               u16                     0x0098E9BC
 declare     bgm_table               u16[142]                0x0098E9C8
 declare     scd_variables_00        u16                     0x0098EAE4

@@ -142,6 +142,7 @@ namespace openre
         FG_ZAPPING_5 = 5,
         FG_ZAPPING_6 = 6,
         FG_ZAPPING_15 = 15,
+
     };
 
     extern GameTable& gGameTable;

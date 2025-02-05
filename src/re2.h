@@ -327,7 +327,8 @@ struct EnemyEntity : ActorEntity
 {
     uint8_t var_218;                    // 0x0218
     uint8_t var_219;                    // 0x0219
-    uint8_t pad_021A[2];                // 0x021A
+    uint8_t var_21A;                    // 0x021A
+    uint8_t var_21B;                    // 0x021B
     uint8_t var_21C;                    // 0x021C
     uint8_t var_21D;                    // 0x021D
     uint8_t var_21E;                    // 0x021E
@@ -338,7 +339,10 @@ struct EnemyEntity : ActorEntity
     uint8_t var_223;                    // 0x0223
     uint8_t pad_0224[3];                // 0x0224
     uint8_t var_227;                    // 0x0227
-    uint8_t pad_0228[4];                // 0x0228
+    uint8_t var_228;                    // 0x0228
+    uint8_t var_229;                    // 0x0229
+    uint8_t var_22A;                    // 0x022A
+    uint8_t var_22B;                    // 0x022B
     uint8_t var_22C;                    // 0x022C
     uint8_t var_22D;                    // 0x022D
     uint8_t var_22E;                    // 0x022E
@@ -349,12 +353,15 @@ struct EnemyEntity : ActorEntity
     uint8_t var_233;                    // 0x0233
     uint8_t var_234;                    // 0x0234
     uint8_t var_235;                    // 0x0235
-    uint8_t pad_0236[4];                // 0x0236
+    uint8_t var_236;                    // 0x0236
+    uint8_t var_237;                    // 0x0237
+    uint8_t pad_0238[1];                // 0x0238
+    uint8_t var_239;                    // 0x0239
     int8_t var_23A;                     // 0x023A
     uint8_t pad_023B[1];                // 0x023B
     uint8_t var_23C;                    // 0x023C
     uint8_t var_23D;                    // 0x023D
-    uint8_t pad_023E[1];                // 0x023E
+    uint8_t var_23E;                    // 0x023E
     uint8_t var_23F;                    // 0x023F
     uint8_t pad_0240[7];                // 0x0240
     uint8_t pad_247;                    // 0x0247
@@ -813,7 +820,9 @@ struct GameTable
     uint8_t table_start;                // 0x98E79C
     uint8_t pad_98E79D[519];            // 0x98E79D
     uint8_t inventory_size;             // 0x98E9A4
-    uint8_t pad_98E9A5[23];             // 0x98E9A5
+    uint8_t pad_98E9A5[19];             // 0x98E9A5
+    uint16_t word_98E9B8;               // 0x98E9B8
+    uint8_t pad_98E9BA[2];              // 0x98E9BA
     uint16_t num_saves;                 // 0x98E9BC
     uint8_t pad_98E9BE[10];             // 0x98E9BE
     uint16_t bgm_table[142];            // 0x98E9C8

@@ -9,6 +9,7 @@ namespace openre::enemy
 {
     enum
     {
+        EM_14 = 14,
         EM_ZOMBIE_COP = 16,
         EM_ZOMBIE_BRAD = 17,
         EM_ZOMBIE_GUY1 = 18,
@@ -109,11 +110,11 @@ namespace openre::enemy
     void goto00(Entity* entity, int x, int z, int t);
     void rot_neck_em(Entity* entity, int d);
     void snd_se_enem(uint8_t id, EnemyEntity* enemy);
-
+    void em_seq_sound(EnemyEntity* enemy);
     bool spawn_enemy(const EnemySpawnInfo& info);
-
     void em_dog(EnemyEntity* enemy);
     void em_spider(EnemyEntity* enemy);
+    void em_zombie(EnemyEntity* enemy);
 
     void enemy_init_hooks();
 }
