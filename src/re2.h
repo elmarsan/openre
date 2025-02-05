@@ -308,7 +308,8 @@ struct EnemyEntity : ActorEntity
 {
     uint8_t var_218;                    // 0x0218
     uint8_t var_219;                    // 0x0219
-    uint8_t pad_021A[2];                // 0x021A
+    uint8_t var_21A;                    // 0x021A
+    uint8_t pad_021B[1];                // 0x021B
     uint8_t var_21C;                    // 0x021C
     uint8_t var_21D;                    // 0x021D
     uint8_t var_21E;                    // 0x021E

@@ -258,6 +258,7 @@ struct      EnemyEntity
 base        ActorEntity
 declare     var_218                 u8          0x218
 declare     var_219                 u8          0x219
+declare     var_21A                 u8          0x21A
 declare     var_21C                 u8          0x21C
 declare     var_21D                 u8          0x21D
 declare     var_21E                 u8          0x21E

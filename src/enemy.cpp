@@ -85,8 +85,7 @@ namespace openre::enemy
         }
     };
 #pragma pack(pop)
-
-    static void em_zombie(EnemyEntity* enemy);
+    
     static void em_21(EnemyEntity* enemy);
     static void em_22(EnemyEntity* enemy);
     static void em_23(EnemyEntity* enemy);
@@ -598,13 +597,7 @@ namespace openre::enemy
             em->neck_flg = 0x92;
 
         return true;
-    }
-
-    // 0x004517F0
-    static void em_zombie(EnemyEntity* enemy)
-    {
-        ((EnemyFunc)0x004517F0)(enemy);
-    }
+    }    
 
     // 0x0045FC10
     static void em_21(EnemyEntity* enemy)
