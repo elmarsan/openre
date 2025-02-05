@@ -568,7 +568,9 @@ struct GameTable
 {
     uint8_t pad_0000[5394102];          // 0x0000
     bool enable_dsound;                 // 0x524EB6
-    uint8_t pad_524EB7[5041];           // 0x524EB7
+    uint8_t pad_524EB7[2];              // 0x524EB7
+    uint8_t graphics_ptr_data;          // 0x524EB9
+    uint8_t pad_524EBA[5038];           // 0x524EBA
     int32_t global_prj;                 // 0x526268
     uint8_t pad_52626C[4];              // 0x52626C
     int16_t math_const_table[1224];     // 0x526270
@@ -626,9 +628,19 @@ struct GameTable
     DoorInfo* door;                     // 0x689400
     uint8_t pad_689404[908];            // 0x689404
     uint32_t idd;                       // 0x689790
-    uint8_t pad_689794[1096];           // 0x689794
+    uint8_t pad_689794[181];            // 0x689794
+    uint8_t stage_bk;                   // 0x689849
+    uint8_t pad_68984A[914];            // 0x68984A
     uint32_t dword_689BDC;              // 0x689BDC
-    uint8_t pad_689BE0[536];            // 0x689BE0
+    uint8_t pad_689BE0[48];             // 0x689BE0
+    uint32_t rdt_count;                 // 0x689C10
+    void* rdt_top_ptr;                  // 0x689C14
+    uint32_t rdt_size;                  // 0x689C18
+    uint32_t dword_689C1C;              // 0x689C1C
+    char room_path[32];                 // 0x689C20
+    char stage_font_name[32];           // 0x689C40
+    PlayerEntity* p_em;                 // 0x689C60
+    uint8_t pad_689C64[404];            // 0x689C64
     uint32_t dword_689DF8;              // 0x689DF8
     uint8_t pad_689DFC[292];            // 0x689DFC
     uint32_t dword_689F20;              // 0x689F20
@@ -664,7 +676,9 @@ struct GameTable
     uint8_t byte_691F70;                // 0x691F70
     uint8_t pad_691F71[5];              // 0x691F71
     uint8_t byte_691F76;                // 0x691F76
-    uint8_t pad_691F77[13];             // 0x691F77
+    uint8_t pad_691F77[4];              // 0x691F77
+    uint8_t byte_691F7B;                // 0x691F7B
+    uint8_t pad_691F7C[8];              // 0x691F7C
     uint8_t itembox_slot_id;            // 0x691F84
     uint8_t byte_691F85;                // 0x691F85
     uint8_t pad_691F86[42];             // 0x691F86
@@ -765,9 +779,12 @@ struct GameTable
     uint8_t pad_9888D0[8];              // 0x9888D0
     uint8_t byte_9888D8;                // 0x9888D8
     uint8_t byte_9888D9;                // 0x9888D9
-    uint8_t pad_9888DA[5522];           // 0x9888DA
+    uint8_t pad_9888DA[5518];           // 0x9888DA
+    uint8_t fg_rbj_set;                 // 0x989E68
+    uint8_t pad_989E69[3];              // 0x989E69
     uint32_t fg_system;                 // 0x989E6C
-    uint8_t pad_989E70[14];             // 0x989E70
+    uint8_t pad_989E70[13];             // 0x989E70
+    uint8_t byte_989E7D;                // 0x989E7D
     uint8_t byte_989E7E;                // 0x989E7E
     uint8_t pad_989E7F[17];             // 0x989E7F
     uint8_t byte_989E90;                // 0x989E90
@@ -800,9 +817,14 @@ struct GameTable
     uint8_t pad_98A5D4[64];             // 0x98A5D4
     EnemyInitEntry enemy_init_entries[2];// 0x98A614
     ObjectEntity pOm[32];               // 0x98A61C
-    uint8_t pad_98E51C[12];             // 0x98E51C
+    ObjectEntity* dword_98E51C;         // 0x98E51C
+    uint8_t pad_98E520[8];              // 0x98E520
     uint8_t aot_count;                  // 0x98E528
-    uint8_t pad_98E529[623];            // 0x98E529
+    uint8_t pad_98E529[27];             // 0x98E529
+    uint32_t dword_98E544;              // 0x98E544
+    uint8_t pad_98E548[580];            // 0x98E548
+    int16_t word_98E78C;                // 0x98E78C
+    uint8_t pad_98E78E[10];             // 0x98E78E
     uint8_t byte_98E798;                // 0x98E798
     uint8_t pad_98E799[3];              // 0x98E799
     uint8_t table_start;                // 0x98E79C
@@ -814,7 +836,9 @@ struct GameTable
     uint8_t byte_98E9A6;                // 0x98E9A6
     uint8_t pad_98E9A7[3];              // 0x98E9A7
     uint8_t byte_98E9AA;                // 0x98E9AA
-    uint8_t pad_98E9AB[11];             // 0x98E9AB
+    uint8_t byte_98E9AB;                // 0x98E9AB
+    int16_t word_98E9AC;                // 0x98E9AC
+    uint8_t pad_98E9AE[8];              // 0x98E9AE
     uint16_t word_98E9B6;               // 0x98E9B6
     uint8_t pad_98E9B8[4];              // 0x98E9B8
     int16_t word_98E9BC;                // 0x98E9BC
@@ -826,7 +850,7 @@ struct GameTable
     uint16_t scd_variables_00;          // 0x98EAE4
     uint16_t word_98EAE6;               // 0x98EAE6
     uint16_t last_used_item;            // 0x98EAE8
-    uint16_t word_98EAEA;               // 0x98EAEA
+    int16_t word_98EAEA;                // 0x98EAEA
     uint8_t pad_98EAEC[16];             // 0x98EAEC
     int16_t word_98EAFC;                // 0x98EAFC
     int16_t word_98EAFE;                // 0x98EAFE
@@ -891,7 +915,8 @@ struct GameTable
     uint32_t dword_991FC4;              // 0x991FC4
     DemoPlayer pdemo;                   // 0x991FC8
     uint8_t byte_99270E;                // 0x99270E
-    uint8_t pad_99270F[42897];          // 0x99270F
+    uint8_t byte_99270F;                // 0x99270F
+    uint8_t pad_992710[42896];          // 0x992710
     DoorEntity* doors[9];               // 0x99CEA0
     uint32_t dword_99CEC4;              // 0x99CEC4
     uint8_t pad_99CEC8[156];            // 0x99CEC8

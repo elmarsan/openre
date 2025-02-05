@@ -14,6 +14,7 @@ namespace openre::audio
     void snd_sys_init_sub2();
     void snd_bgm_ck();
     void snd_room_load();
+    void snd_bgm_set();
 
     void bgm_init_hooks();
 }
