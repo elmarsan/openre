@@ -13,6 +13,8 @@
 #include "rdt.h"
 #include "sce.h"
 
+#include <cstring>
+
 using namespace openre::audio;
 using namespace openre::camera;
 using namespace openre::file;
