@@ -10,6 +10,7 @@ namespace openre::file
     void sub_505B20();
     void* file_alloc(const size_t size);
     int load_adt(const char* path, uint32_t* bufferSize, int mode);
+    int osp_read();
 
     void file_init_hooks();
 }

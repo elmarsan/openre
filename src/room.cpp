@@ -2,14 +2,24 @@
 
 #include "room.h"
 #include "audio.h"
+#include "camera.h"
+#include "enemy.h"
+#include "entity.h"
 #include "file.h"
 #include "interop.hpp"
+#include "marni.h"
 #include "openre.h"
 #include "player.h"
+#include "rdt.h"
+#include "sce.h"
 
 using namespace openre::audio;
+using namespace openre::camera;
 using namespace openre::file;
 using namespace openre::player;
+using namespace openre::sce;
+using namespace openre::rdt;
+using namespace openre::enemy;
 
 namespace openre::room
 {
@@ -48,10 +58,43 @@ namespace openre::room
         interop::call<void, int>(0x00502190, a1);
     }
 
+    // 0x004DD0C0
+    static void psp_init0()
+    {
+        interop::call(0x004DD0C0);
+    }
+
+    // 0x004DD0E0
+    static void psp_init1()
+    {
+        interop::call(0x004DD0E0);
+    }
+
+    // 0x005023D0
+    static void st_room_set()
+    {
+        interop::call(0x005023D0);
+    }
+
+    // 0x004B8080
+    static void esp_init_r()
+    {
+        interop::call(0x004B8080);
+    }
+
     static void get_rdt_path(char* buffer, uint8_t player, uint8_t stage, uint8_t room)
     {
         auto stageSym = gStageSymbols[(gGameTable.byte_98E798) + gGameTable.current_stage];
         std::sprintf(buffer, "Pl%d\\Rdt\\room%c%02x%d.rdt", player, stageSym, room, player);
+    }
+
+    static void memset32(void* dest, uint32_t value, size_t count)
+    {
+        auto* ptr = static_cast<uint32_t*>(dest);
+        for (size_t i = 0; i < count; i++)
+        {
+            ptr[i] = value;
+        }
     }
 
     // 0x004DE7B0
@@ -164,7 +207,8 @@ namespace openre::room
                 if (gGameTable.current_stage == gGameTable.byte_989E7D)
                 {
                     ctcb.var_0D = 5;
-                    goto LABEL_44;
+                    continue;
+                    // goto LABEL_44;
                 }
 
                 gGameTable.byte_989E7D = gGameTable.current_stage & 0xff;
@@ -210,113 +254,185 @@ namespace openre::room
             }
             case 4:
             case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9: interop::call(0x004DE7B0); return;
-            case 10:
-            LABEL_35:
-                snd_bgm_set();
-                if (ctcb.var_13)
+            {
+                interop::call(0x004DE7B0);
+                return;
+
+                gGameTable.word_989EE8 = 3333;
+                osp_read();
+                gGameTable.byte_689C64 = 1;
+                // Read rdt header
+                gGameTable.rdt_size = read_file_into_buffer(gGameTable.room_path, gGameTable.rdt, 8);
+                if (!gGameTable.rdt_size)
                 {
+                    file_error();
                     return;
                 }
-                sub_4450C0(0);
-                gGameTable.dword_98862C = gGameTable.enemies[0];
-                gGameTable.enemy_count = 0;
-                std::memset(&gGameTable.splayer_work, gGameTable.dword_98E544, 33);
-                // v5 = 33;
-                // v6 = 33;
-                // do
-                // {
-                //     --v5;
-                //     --v6;
-                // } while (v6);
-                // gGameTable.rdt_count = 0;
-                gGameTable.enemy_init_entries[0].enabled = 0;
-                gGameTable.enemy_init_entries[1].enabled = 0;
-                sub_43DF40();
-                // i = 32;
-                gGameTable.dword_98E51C = &gGameTable.pOm[0];
-                gGameTable.rdt_count = 32;
-                // do
-                // {
-                //     --i;
-                //     gGameTable.pOm.be_flg = 0;
-                // } while (i);
-                if (gGameTable.p_em->id == (gGameTable.next_pld & 0xff))
+                for (int i = 0; i < 23; i++)
                 {
-                    ctcb.var_0D = 2;
-                LABEL_44:
-                    if (ctcb.var_0D > 10)
+                    if (gGameTable.rdt->offsets[i])
                     {
-                        return;
-                    }
-                    continue;
-                }
-                if (gGameTable.next_pld < 12)
-                {
-                    if (gGameTable.next_pld & 1)
-                    {
-                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_6))
-                        {
-                            gGameTable.next_pld = 9;
-                        }
-                    }
-                    else
-                    {
-                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_5))
-                        {
-                            gGameTable.next_pld = 8;
-                        }
-                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_15))
-                        {
-                            gGameTable.next_pld = 10;
-                        }
+                        gGameTable.rdt_top_ptr = gGameTable.rdt->offsets[i];
                     }
                 }
-                gGameTable.dword_689BDC = gGameTable.p_em->id;
-                gGameTable.p_em->id = gGameTable.next_pld & 0xff;
-                st_chenge_pl(gGameTable.next_pld);
-                player_set(gGameTable.p_em);
-
+                // TODO
+                if (gGameTable.rdt->header.num_cuts)
+                {
+                }
+                // TODO
+                if (gGameTable.rdt->header.num_models)
+                {
+                }
+                cut_change(gGameTable.current_cut);
+                esp_init_r();
+                ctcb.var_0D = 6;
+            LABEL_84:
+                snd_room_load();
                 if (!ctcb.var_13)
                 {
-                    gGameTable.p_em->routine_0 = 0;
-                    gGameTable.p_em->routine_1 = 0;
-                    gGameTable.p_em->routine_2 = 0;
-                    gGameTable.p_em->routine_3 = 0;
-
-                    if (gGameTable.next_pld == 14 || gGameTable.next_pld == 15)
+                    marni::unload_texture_page(17);
+                    sce_model_init();
+                    snd_bgm_play_ck();
+                    if (!rdt_get_offset<void*>(RdtOffsetKind::VH))
                     {
-                        gGameTable.word_98EAE6 = gGameTable.pl.life;
-                        gGameTable.byte_98E9AB = gGameTable.poison_timer;
-                        gGameTable.word_98E9AC = gGameTable.poison_status;
-                        gGameTable.poison_timer = 0;
-                        gGameTable.poison_status = 0;
-                        gGameTable.pl.life = gGameTable.pl.max_life;
+                        gGameTable.mem_top = rdt_get_offset<void*>(RdtOffsetKind::VH);
                     }
-                    else if (gGameTable.dword_689C1C >= 12)
-                    {
-                        gGameTable.pl.life = gGameTable.word_98E9B6;
-                        gGameTable.poison_timer = gGameTable.byte_98E9AB;
-                        gGameTable.poison_status = gGameTable.word_98E9AC;
-                        gGameTable.pl.life = gGameTable.pl.max_life;
-                    }
-
-                    gGameTable.byte_691F7B = 1;
-                    ctcb.var_0D = 1;
-
-                LABEL_62:
-                    snd_load_core(gGameTable.next_pld & 0xff, 1);
+                    // TODO: Set type of dword_98862C  to ActorEntity
+                    gGameTable.dword_98862C = gGameTable.player_work;
+                    gGameTable.pl.routine_0 = 0;
+                    gGameTable.pl.routine_1 = 0;
+                    gGameTable.pl.routine_2 = 0;
+                    gGameTable.pl.routine_3 = 0;
+                    player_move(&gGameTable.pl);
+                    sce_scheduler_set();
+                    ctcb.var_0D = 7;
+                LABEL_88:
+                    snd_load_enemy();
                     if (!ctcb.var_13)
                     {
-                    LABEL_63:
-                        gGameTable.byte_99270F = 0;
-                        ctcb.var_0D = 3;
-                        task_sleep(1);
+                        rbj_set();
+                        psp_init0();
+                        ctcb.var_0D = 8;
+                    LABEL_90:
+                        marni::out();
+                        if (!ctcb.var_13)
+                        {
+                            em_init_move();
+                            psp_init1();
+                            ctcb.var_0D = 9;
+                        LABEL_92:
+                            if (gGameTable.byte_99270F)
+                            {
+                                task_sleep(1);
+                            }
+                            else
+                            {
+                                st_room_set();
+                                marni::flush_surfaces();
+                                ctcb.var_0D = 0;
+                            }
+                        }
                     }
                 }
+                return;
+            }
+            case 6: goto LABEL_84;
+            case 7: goto LABEL_88;
+            case 8: goto LABEL_90;
+            case 9: goto LABEL_92;
+            case 10:
+            LABEL_35:
+                interop::call(0x004DE7B0);
+                return;
+                // LABEL_35:
+                //     snd_bgm_set();
+                //     if (ctcb.var_13)
+                //     {
+                //         return;
+                //     }
+                //     sub_4450C0(0);
+                //     gGameTable.dword_98862C = gGameTable.enemies[0];
+                //     gGameTable.enemy_count = 0;
+                //     memset32(&gGameTable.splayer_work, 0x0098E544, 33);
+                //     gGameTable.enemy_init_entries[0].enabled = 0;
+                //     gGameTable.enemy_init_entries[1].enabled = 0;
+                //     sub_43DF40();
+                //     gGameTable.dword_98E51C = (uint32_t)&gGameTable.pOm;
+                //     gGameTable.rdt_count = 32;
+                //     gGameTable.pOm->be_flg = 0;
+                //     // std::memset(gGameTable.pOm, 0, 32 * sizeof(ObjectEntity));
+                //     if (gGameTable.p_em->id == (gGameTable.next_pld & 0xff))
+                //     {
+                //         ctcb.var_0D = 2;
+                //         // LABEL_44:
+                //         // if (ctcb.var_0D > 10)
+                //         // {
+                //         //     return;
+                //         // }
+                //         continue;
+                //     }
+                //     if (gGameTable.next_pld < 12)
+                //     {
+                //         if (gGameTable.next_pld & 1)
+                //         {
+                //             if (check_flag(FlagGroup::Zapping, FG_ZAPPING_6))
+                //             {
+                //                 gGameTable.next_pld = 9;
+                //             }
+                //         }
+                //         else
+                //         {
+                //             if (check_flag(FlagGroup::Zapping, FG_ZAPPING_5))
+                //             {
+                //                 gGameTable.next_pld = 8;
+                //             }
+                //             if (check_flag(FlagGroup::Zapping, FG_ZAPPING_15))
+                //             {
+                //                 gGameTable.next_pld = 10;
+                //             }
+                //         }
+                //     }
+                //     gGameTable.dword_689C1C = gGameTable.p_em->id;
+                //     gGameTable.p_em->id = gGameTable.next_pld & 0xff;
+                //     st_chenge_pl(gGameTable.next_pld);
+                //     player_set(gGameTable.p_em);
+
+                //    if (!ctcb.var_13)
+                //    {
+                //        gGameTable.p_em->routine_0 = 0;
+                //        gGameTable.p_em->routine_1 = 0;
+                //        gGameTable.p_em->routine_2 = 0;
+                //        gGameTable.p_em->routine_3 = 0;
+
+                //        if (gGameTable.next_pld == 14 || gGameTable.next_pld == 15)
+                //        {
+                //            gGameTable.word_98E9B6 = gGameTable.pl.life;
+                //            gGameTable.byte_98E9AB = gGameTable.poison_timer;
+                //            gGameTable.word_98E9AC = gGameTable.poison_status;
+                //            gGameTable.poison_timer = 0;
+                //            gGameTable.poison_status = 0;
+                //            gGameTable.pl.life = gGameTable.pl.max_life;
+                //        }
+                //        else if (gGameTable.dword_689C1C >= 12)
+                //        {
+                //            gGameTable.pl.life = gGameTable.word_98E9B6;
+                //            gGameTable.poison_timer = gGameTable.byte_98E9AB;
+                //            gGameTable.poison_status = gGameTable.word_98E9AC;
+                //            gGameTable.pl.life = gGameTable.pl.max_life;
+                //        }
+
+                gGameTable.byte_691F7B = 1;
+                ctcb.var_0D = 1;
+            LABEL_62:
+                snd_load_core(gGameTable.next_pld & 0xff, 1);
+                if (!ctcb.var_13)
+                {
+                LABEL_63:
+                    gGameTable.byte_99270F = 0;
+                    ctcb.var_0D = 3;
+                    task_sleep(1);
+                }
+                //}
                 return;
             }
 

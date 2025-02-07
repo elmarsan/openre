@@ -492,6 +492,7 @@ declare     dword_689C1C            u32                     0x00689C1C
 declare     room_path               char[32]                0x00689C20
 declare     stage_font_name         char[32]                0x00689C40
 declare     p_em                    PlayerEntity*           0x00689C60
+declare     byte_689C64             u8                      0x00689C64
 declare     dword_689DF8            u32                     0x00689DF8
 declare     dword_689F20            u32                     0x00689F20
 declare     ctcb                    Unknown68A204*          0x0068A204
@@ -609,7 +610,7 @@ declare     enemy_init_map          void*[96]               0x0098A154
 declare     enemy_init_table        void*[192]              0x0098A2D4
 declare     enemy_init_entries      EnemyInitEntry[2]       0x0098A614
 declare     pOm                     ObjectEntity[32]        0x0098A61C
-declare     dword_98E51C            ObjectEntity*           0x0098E51C
+declare     dword_98E51C            u32                     0x0098E51C
 declare     aot_count               u8                      0x0098E528
 declare     dword_98E544            u32                     0x0098E544
 declare     word_98E78C             s16                     0x0098E78C

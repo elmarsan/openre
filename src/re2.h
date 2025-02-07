@@ -640,7 +640,8 @@ struct GameTable
     char room_path[32];                 // 0x689C20
     char stage_font_name[32];           // 0x689C40
     PlayerEntity* p_em;                 // 0x689C60
-    uint8_t pad_689C64[404];            // 0x689C64
+    uint8_t byte_689C64;                // 0x689C64
+    uint8_t pad_689C65[403];            // 0x689C65
     uint32_t dword_689DF8;              // 0x689DF8
     uint8_t pad_689DFC[292];            // 0x689DFC
     uint32_t dword_689F20;              // 0x689F20
@@ -817,7 +818,7 @@ struct GameTable
     uint8_t pad_98A5D4[64];             // 0x98A5D4
     EnemyInitEntry enemy_init_entries[2];// 0x98A614
     ObjectEntity pOm[32];               // 0x98A61C
-    ObjectEntity* dword_98E51C;         // 0x98E51C
+    uint32_t dword_98E51C;              // 0x98E51C
     uint8_t pad_98E520[8];              // 0x98E520
     uint8_t aot_count;                  // 0x98E528
     uint8_t pad_98E529[27];             // 0x98E529

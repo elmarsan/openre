@@ -34,4 +34,10 @@ namespace openre::marni
     {
         interop::call<void, int>(0x0043F550, page);
     }
+
+    // 0x00441710
+    void flush_surfaces()
+    {
+        interop::call(0x00441710);
+    }
 }

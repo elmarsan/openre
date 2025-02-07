@@ -66,7 +66,7 @@ namespace openre::file
     }
 
     // 0x004DD360
-    static int osp_read()
+    int osp_read()
     {
         const char* ospFilepath = "common\\bin\\osp.bin";
 
