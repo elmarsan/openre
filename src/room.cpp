@@ -99,6 +99,25 @@ namespace openre::room
         }
     }
 
+    struct RdtCamera
+    {
+        uint16_t flags;       // 0x00
+        uint16_t perspective; // 0x02
+        int32_t pos_x;        // 0x04
+        int32_t pos_y;        // 0x08
+        int32_t pos_z;        // 0x0C
+        int32_t target_x;     // 0x10
+        int32_t target_y;     // 0x14
+        int32_t target_z;     // 0x18
+        uint32_t offset;      // 0x1C
+    };
+
+    struct RdtModel
+    {
+        uint32_t textureOffset; // 0x00
+        uint32_t modelOffset;   // 0x04
+    };
+
     // 0x004DE7B0
     void room_set()
     {
@@ -113,6 +132,9 @@ namespace openre::room
             {
             case 0:
             {
+                // interop::call(0x004DE7B0);
+                // return;
+
                 strcpy(gGameTable.room_path, "Pl0\\Rdt\\room1000.rdt");
                 if (gGameTable.graphics_ptr_data == 1)
                 {
@@ -206,6 +228,9 @@ namespace openre::room
             case 2: goto LABEL_63;
             case 3:
             {
+                interop::call(0x004DE7B0);
+                return;
+
                 if (gGameTable.current_stage == gGameTable.byte_989E7D)
                 {
                     ctcb.var_0D = 5;
@@ -257,13 +282,11 @@ namespace openre::room
             case 4:
             case 5:
             {
-                interop::call(0x004DE7B0);
-                return;
-
+                // interop::call(0x004DE7B0);
+                // return;
                 gGameTable.word_989EE8 = 3333;
                 osp_read();
                 gGameTable.byte_689C64 = 1;
-                // Read rdt header
                 gGameTable.rdt_size = read_file_into_buffer(gGameTable.room_path, gGameTable.rdt, 8);
                 if (!gGameTable.rdt_size)
                 {
@@ -272,20 +295,41 @@ namespace openre::room
                 }
                 for (int i = 0; i < 23; i++)
                 {
+                    auto baseRdt = (uint32_t) & (*gGameTable.rdt);
+
                     if (gGameTable.rdt->offsets[i])
                     {
-                        gGameTable.rdt_top_ptr = gGameTable.rdt->offsets[i];
+                        auto offset = rdt_get_offset<uintptr_t>(static_cast<RdtOffsetKind>(i));
+                        gGameTable.rdt->offsets[i] = (void*)(baseRdt + (uint32_t)offset);
                     }
                 }
-                // TODO
+
+                gGameTable.rdt_count = 0;
                 if (gGameTable.rdt->header.num_cuts)
                 {
+                    auto baseRdt = (uint32_t) & (*gGameTable.rdt);
+                    auto cameras = rdt_get_offset<RdtCamera>(RdtOffsetKind::RID);
+                    for (int i = 0; i < gGameTable.rdt->header.num_cuts; i++)
+                    {
+                        cameras[i].offset += baseRdt;
+                        gGameTable.rdt_count++;
+                    }
                 }
-                // TODO
+
+                gGameTable.mem_top = reinterpret_cast<void*>((uintptr_t)gGameTable.mem_top + gGameTable.rdt_size);
+                gGameTable.rdt_count = 0;
                 if (gGameTable.rdt->header.num_models)
                 {
+                    auto baseRdt = (uint32_t) & (*gGameTable.rdt);
+                    auto models = rdt_get_offset<RdtModel>(RdtOffsetKind::MODELS);
+                    for (int i = 0; i < gGameTable.rdt->header.num_models; i++)
+                    {
+                        models[i].modelOffset += baseRdt;
+                        gGameTable.rdt_count++;
+                    }
                 }
-                cut_change(gGameTable.current_cut);
+
+                cut_change(gGameTable.current_cut & 0xff);
                 esp_init_r();
                 ctcb.var_0D = 6;
             LABEL_84:
@@ -295,12 +339,12 @@ namespace openre::room
                     marni::unload_texture_page(17);
                     sce_model_init();
                     snd_bgm_play_ck();
-                    if (!rdt_get_offset<void*>(RdtOffsetKind::VH))
+                    if (rdt_get_offset<void*>(RdtOffsetKind::VB))
                     {
-                        gGameTable.mem_top = rdt_get_offset<void*>(RdtOffsetKind::VH);
+                        gGameTable.mem_top = rdt_get_offset<void*>(RdtOffsetKind::VB);
                     }
                     // TODO: Set type of dword_98862C  to ActorEntity
-                    gGameTable.dword_98862C = gGameTable.player_work;
+                    gGameTable.dword_98862C = &gGameTable.pl;
                     gGameTable.pl.routine_0 = 0;
                     gGameTable.pl.routine_1 = 0;
                     gGameTable.pl.routine_2 = 0;
