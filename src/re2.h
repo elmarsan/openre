@@ -790,7 +790,7 @@ struct GameTable
     Rdt* rdt;                           // 0x98861C
     uint32_t dword_988620;              // 0x988620
     void* mem_top;                      // 0x988624
-    uint32_t dword_988628;              // 0x988628
+    ActorEntity* dword_988628;          // 0x988628
     void* dword_98862C;                 // 0x98862C
     VCut* vcut_data[2];                 // 0x988630
     void* em_damage_table_16[48];       // 0x988638

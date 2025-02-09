@@ -588,7 +588,7 @@ declare     dword_988610            u32                     0x00988610
 declare     rdt                     Rdt*                    0x0098861C
 declare     dword_988620            u32                     0x00988620
 declare     mem_top                 void*                   0x00988624
-declare     dword_988628            u32                     0x00988628
+declare     dword_988628            ActorEntity*            0x00988628
 declare     dword_98862C            void*                   0x0098862C
 declare     vcut_data               VCut*[2]                0x00988630
 declare     em_damage_table_16      void*[48]               0x00988638

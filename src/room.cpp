@@ -42,15 +42,15 @@ namespace openre::room
     }
 
     // 0x0043DF40
-    static void sub_43DF40()
+    static int sub_43DF40()
     {
-        interop::call<void>(0x0043DF40);
+        return interop::call<int>(0x0043DF40);
     }
 
     // 0x00502190
-    static void st_chenge_pl(int a1)
+    static void st_chenge_pl(int a0)
     {
-        interop::call<void, int>(0x00502190, a1);
+        interop::call<void, int>(0x00502190, a0);
     }
 
     // 0x004DD0C0
@@ -89,6 +89,9 @@ namespace openre::room
     // 0x004DE7B0
     void room_set()
     {
+        // interop::call(0x004DE7B0);
+        // return;
+
         auto& ctcb = *gGameTable.ctcb;
 
         while (true)
@@ -237,6 +240,9 @@ namespace openre::room
             case 4:
             case 5:
             {
+                // interop::call(0x004DE7B0);
+                // return;
+
                 gGameTable.word_989EE8 = 3333;
                 osp_read();
                 gGameTable.byte_689C64 = 1;
@@ -298,7 +304,7 @@ namespace openre::room
                         gGameTable.mem_top = rdt_get_offset<void*>(RdtOffsetKind::VB);
                     }
                     // TODO: Set type of dword_988628  to ActorEntity
-                    gGameTable.dword_988628 = (uint32_t)&gGameTable.pl;
+                    gGameTable.dword_988628 = &gGameTable.pl;
                     gGameTable.pl.routine_0 = 0;
                     gGameTable.pl.routine_1 = 0;
                     gGameTable.pl.routine_2 = 0;
@@ -349,7 +355,7 @@ namespace openre::room
                     return;
                 }
                 sub_4450C0(0);
-                gGameTable.dword_98862C = gGameTable.enemies[0];
+                gGameTable.dword_98862C = &gGameTable.enemies;
                 gGameTable.enemy_count = 0;
                 memset32(&gGameTable.splayer_work, 0x0098E544, 33);
                 gGameTable.enemy_init_entries[0].enabled = 0;
