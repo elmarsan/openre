@@ -11,6 +11,7 @@ namespace openre::file
     void* file_alloc(const size_t size);
     int load_adt(const char* path, uint32_t* bufferSize, int mode);
     int osp_read();
+    int tim_buffer_to_surface(int* timPtr, int page, int mode);
 
     void file_init_hooks();
 }

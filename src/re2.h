@@ -432,6 +432,27 @@ struct Rdt
 };
 static_assert(sizeof(Rdt) == 0x64);
 
+struct RdtCamera
+{
+    uint16_t flags;                     // 0x0000
+    uint16_t perspective;               // 0x0002
+    int32_t pos_x;                      // 0x0004
+    int32_t pos_y;                      // 0x0008
+    int32_t pos_z;                      // 0x000C
+    int32_t target_x;                   // 0x0010
+    int32_t target_y;                   // 0x0014
+    int32_t target_z;                   // 0x0018
+    uint32_t offset;                    // 0x001C
+};
+static_assert(sizeof(RdtCamera) == 0x20);
+
+struct RdtModel
+{
+    uint32_t texture_offset;            // 0x0000
+    uint32_t model_offset;              // 0x0004
+};
+static_assert(sizeof(RdtModel) == 0x08);
+
 struct DoorInfo
 {
     void* prepacket;                    // 0x0000
@@ -769,7 +790,7 @@ struct GameTable
     Rdt* rdt;                           // 0x98861C
     uint32_t dword_988620;              // 0x988620
     void* mem_top;                      // 0x988624
-    uint8_t pad_988628[4];              // 0x988628
+    uint32_t dword_988628;              // 0x988628
     void* dword_98862C;                 // 0x98862C
     VCut* vcut_data[2];                 // 0x988630
     void* em_damage_table_16[48];       // 0x988638
@@ -840,7 +861,7 @@ struct GameTable
     uint8_t byte_98E9AB;                // 0x98E9AB
     int16_t word_98E9AC;                // 0x98E9AC
     uint8_t pad_98E9AE[8];              // 0x98E9AE
-    uint16_t word_98E9B6;               // 0x98E9B6
+    int16_t word_98E9B6;                // 0x98E9B6
     uint8_t pad_98E9B8[4];              // 0x98E9B8
     int16_t word_98E9BC;                // 0x98E9BC
     int16_t word_98E9BE;                // 0x98E9BE
@@ -866,7 +887,7 @@ struct GameTable
     uint16_t rng;                       // 0x98EB1E
     uint16_t word_98EB20;               // 0x98EB20
     uint16_t word_98EB22;               // 0x98EB22
-    uint16_t next_pld;                  // 0x98EB24
+    int16_t next_pld;                   // 0x98EB24
     uint16_t word_98EB26;               // 0x98EB26
     uint16_t word_98EB28;               // 0x98EB28
     uint16_t word_98EB2A;               // 0x98EB2A

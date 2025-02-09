@@ -11,6 +11,7 @@
 #include "openre.h"
 #include "player.h"
 #include "rdt.h"
+#include "re2.h"
 #include "sce.h"
 
 #include <cstring>
@@ -28,18 +29,10 @@ namespace openre::room
     static const char* font1 = "common\\data\\font1.tim";
     static const char* font2 = "common\\data\\font1.adt";
 
-    // static ObjectEntity*& dword_98E51C = *((ObjectEntity**)0x98E51C);
-
     // 0x00442EA0
     static void set_registry_flag(int a0, int a1)
     {
         interop::call<void, int, int>(0x00442EA0, a0, a1);
-    }
-
-    // 0x0043FF40
-    static int32_t tim_buffer_to_surface(uint32_t* timPtr, uint32_t page, int mode)
-    {
-        return interop::call<int32_t>(0x0043FF40, timPtr, page, mode);
     }
 
     // 0x004450C0
@@ -84,12 +77,6 @@ namespace openre::room
         interop::call(0x004B8080);
     }
 
-    static void get_rdt_path(char* buffer, uint8_t player, uint8_t stage, uint8_t room)
-    {
-        auto stageSym = gStageSymbols[(gGameTable.byte_98E798) + gGameTable.current_stage];
-        std::sprintf(buffer, "Pl%d\\Rdt\\room%c%02x%d.rdt", player, stageSym, room, player);
-    }
-
     static void memset32(void* dest, uint32_t value, size_t count)
     {
         auto* ptr = static_cast<uint32_t*>(dest);
@@ -99,31 +86,9 @@ namespace openre::room
         }
     }
 
-    struct RdtCamera
-    {
-        uint16_t flags;       // 0x00
-        uint16_t perspective; // 0x02
-        int32_t pos_x;        // 0x04
-        int32_t pos_y;        // 0x08
-        int32_t pos_z;        // 0x0C
-        int32_t target_x;     // 0x10
-        int32_t target_y;     // 0x14
-        int32_t target_z;     // 0x18
-        uint32_t offset;      // 0x1C
-    };
-
-    struct RdtModel
-    {
-        uint32_t textureOffset; // 0x00
-        uint32_t modelOffset;   // 0x04
-    };
-
     // 0x004DE7B0
     void room_set()
     {
-        // interop::call(0x004DE7B0);
-        // return;
-
         auto& ctcb = *gGameTable.ctcb;
 
         while (true)
@@ -132,9 +97,6 @@ namespace openre::room
             {
             case 0:
             {
-                // interop::call(0x004DE7B0);
-                // return;
-
                 strcpy(gGameTable.room_path, "Pl0\\Rdt\\room1000.rdt");
                 if (gGameTable.graphics_ptr_data == 1)
                 {
@@ -228,14 +190,10 @@ namespace openre::room
             case 2: goto LABEL_63;
             case 3:
             {
-                interop::call(0x004DE7B0);
-                return;
-
                 if (gGameTable.current_stage == gGameTable.byte_989E7D)
                 {
                     ctcb.var_0D = 5;
                     continue;
-                    // goto LABEL_44;
                 }
 
                 gGameTable.byte_989E7D = gGameTable.current_stage & 0xff;
@@ -268,22 +226,17 @@ namespace openre::room
                     }
                     break;
                 }
-                default:
-                {
-                    tim_buffer_to_surface((uint32_t*)(fBuff), 9, 1);
-                    file_alloc(0);
-                    gGameTable.stage_bk = gGameTable.byte_989E7D;
-                    ctcb.var_0D = 4;
-                    task_sleep(1);
-                    return;
                 }
-                }
+                tim_buffer_to_surface(reinterpret_cast<int*>(fBuff), 9, 1);
+                file_alloc(0);
+                gGameTable.stage_bk = gGameTable.byte_989E7D;
+                ctcb.var_0D = 4;
+                task_sleep(1);
+                return;
             }
             case 4:
             case 5:
             {
-                // interop::call(0x004DE7B0);
-                // return;
                 gGameTable.word_989EE8 = 3333;
                 osp_read();
                 gGameTable.byte_689C64 = 1;
@@ -324,7 +277,7 @@ namespace openre::room
                     auto models = rdt_get_offset<RdtModel>(RdtOffsetKind::MODELS);
                     for (int i = 0; i < gGameTable.rdt->header.num_models; i++)
                     {
-                        models[i].modelOffset += baseRdt;
+                        models[i].model_offset += baseRdt;
                         gGameTable.rdt_count++;
                     }
                 }
@@ -337,14 +290,15 @@ namespace openre::room
                 if (!ctcb.var_13)
                 {
                     marni::unload_texture_page(17);
+                    // TODO: Fix this shit!
                     sce_model_init();
                     snd_bgm_play_ck();
                     if (rdt_get_offset<void*>(RdtOffsetKind::VB))
                     {
                         gGameTable.mem_top = rdt_get_offset<void*>(RdtOffsetKind::VB);
                     }
-                    // TODO: Set type of dword_98862C  to ActorEntity
-                    gGameTable.dword_98862C = &gGameTable.pl;
+                    // TODO: Set type of dword_988628  to ActorEntity
+                    gGameTable.dword_988628 = (uint32_t)&gGameTable.pl;
                     gGameTable.pl.routine_0 = 0;
                     gGameTable.pl.routine_1 = 0;
                     gGameTable.pl.routine_2 = 0;
@@ -387,85 +341,78 @@ namespace openre::room
             case 8: goto LABEL_90;
             case 9: goto LABEL_92;
             case 10:
+            {
             LABEL_35:
-                interop::call(0x004DE7B0);
-                return;
-                // LABEL_35:
-                //     snd_bgm_set();
-                //     if (ctcb.var_13)
-                //     {
-                //         return;
-                //     }
-                //     sub_4450C0(0);
-                //     gGameTable.dword_98862C = gGameTable.enemies[0];
-                //     gGameTable.enemy_count = 0;
-                //     memset32(&gGameTable.splayer_work, 0x0098E544, 33);
-                //     gGameTable.enemy_init_entries[0].enabled = 0;
-                //     gGameTable.enemy_init_entries[1].enabled = 0;
-                //     sub_43DF40();
-                //     gGameTable.dword_98E51C = (uint32_t)&gGameTable.pOm;
-                //     gGameTable.rdt_count = 32;
-                //     gGameTable.pOm->be_flg = 0;
-                //     // std::memset(gGameTable.pOm, 0, 32 * sizeof(ObjectEntity));
-                //     if (gGameTable.p_em->id == (gGameTable.next_pld & 0xff))
-                //     {
-                //         ctcb.var_0D = 2;
-                //         // LABEL_44:
-                //         // if (ctcb.var_0D > 10)
-                //         // {
-                //         //     return;
-                //         // }
-                //         continue;
-                //     }
-                //     if (gGameTable.next_pld < 12)
-                //     {
-                //         if (gGameTable.next_pld & 1)
-                //         {
-                //             if (check_flag(FlagGroup::Zapping, FG_ZAPPING_6))
-                //             {
-                //                 gGameTable.next_pld = 9;
-                //             }
-                //         }
-                //         else
-                //         {
-                //             if (check_flag(FlagGroup::Zapping, FG_ZAPPING_5))
-                //             {
-                //                 gGameTable.next_pld = 8;
-                //             }
-                //             if (check_flag(FlagGroup::Zapping, FG_ZAPPING_15))
-                //             {
-                //                 gGameTable.next_pld = 10;
-                //             }
-                //         }
-                //     }
-                //     gGameTable.dword_689C1C = gGameTable.p_em->id;
-                //     gGameTable.p_em->id = gGameTable.next_pld & 0xff;
-                //     st_chenge_pl(gGameTable.next_pld);
-                //     player_set(gGameTable.p_em);
+                snd_bgm_set();
+                if (ctcb.var_13)
+                {
+                    return;
+                }
+                sub_4450C0(0);
+                gGameTable.dword_98862C = gGameTable.enemies[0];
+                gGameTable.enemy_count = 0;
+                memset32(&gGameTable.splayer_work, 0x0098E544, 33);
+                gGameTable.enemy_init_entries[0].enabled = 0;
+                gGameTable.enemy_init_entries[1].enabled = 0;
+                sub_43DF40();
 
-                //    if (!ctcb.var_13)
-                //    {
-                //        gGameTable.p_em->routine_0 = 0;
-                //        gGameTable.p_em->routine_1 = 0;
-                //        gGameTable.p_em->routine_2 = 0;
-                //        gGameTable.p_em->routine_3 = 0;
+                gGameTable.dword_98E51C = (uint32_t)&gGameTable.pOm;
+                gGameTable.rdt_count = 32;
+                gGameTable.pOm->be_flg = 0;
+                if (gGameTable.p_em->id == (gGameTable.next_pld & 0xff))
+                {
+                    ctcb.var_0D = 2;
+                    continue;
+                }
+                if (gGameTable.next_pld < 12)
+                {
+                    if (gGameTable.next_pld & 1)
+                    {
+                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_6))
+                        {
+                            gGameTable.next_pld = 9;
+                        }
+                    }
+                    else
+                    {
+                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_5))
+                        {
+                            gGameTable.next_pld = 8;
+                        }
+                        if (check_flag(FlagGroup::Zapping, FG_ZAPPING_15))
+                        {
+                            gGameTable.next_pld = 10;
+                        }
+                    }
+                }
+                gGameTable.dword_689C1C = gGameTable.p_em->id;
+                gGameTable.p_em->id = static_cast<uint8_t>(gGameTable.next_pld);
+                st_chenge_pl(gGameTable.next_pld);
+                player_set(gGameTable.p_em);
 
-                //        if (gGameTable.next_pld == 14 || gGameTable.next_pld == 15)
-                //        {
-                //            gGameTable.word_98E9B6 = gGameTable.pl.life;
-                //            gGameTable.byte_98E9AB = gGameTable.poison_timer;
-                //            gGameTable.word_98E9AC = gGameTable.poison_status;
-                //            gGameTable.poison_timer = 0;
-                //            gGameTable.poison_status = 0;
-                //            gGameTable.pl.life = gGameTable.pl.max_life;
-                //        }
-                //        else if (gGameTable.dword_689C1C >= 12)
-                //        {
-                //            gGameTable.pl.life = gGameTable.word_98E9B6;
-                //            gGameTable.poison_timer = gGameTable.byte_98E9AB;
-                //            gGameTable.poison_status = gGameTable.word_98E9AC;
-                //            gGameTable.pl.life = gGameTable.pl.max_life;
-                //        }
+                if (!ctcb.var_13)
+                {
+                    gGameTable.p_em->routine_0 = 0;
+                    gGameTable.p_em->routine_1 = 0;
+                    gGameTable.p_em->routine_2 = 0;
+                    gGameTable.p_em->routine_3 = 0;
+
+                    if (gGameTable.next_pld == 14 || gGameTable.next_pld == 15)
+                    {
+                        gGameTable.word_98E9B6 = gGameTable.pl.life;
+                        gGameTable.byte_98E9AB = gGameTable.poison_timer;
+                        gGameTable.word_98E9AC = gGameTable.poison_status;
+                        gGameTable.poison_timer = 0;
+                        gGameTable.poison_status = 0;
+                        gGameTable.pl.life = gGameTable.pl.max_life;
+                    }
+                    else if ((gGameTable.dword_689C1C & 0xff) >= 12)
+                    {
+                        gGameTable.poison_timer = gGameTable.byte_98E9AB;
+                        gGameTable.poison_status = gGameTable.word_98E9AC;
+                        gGameTable.pl.life = gGameTable.word_98E9B6;
+                    }
+                }
 
                 gGameTable.byte_691F7B = 1;
                 ctcb.var_0D = 1;
@@ -478,12 +425,9 @@ namespace openre::room
                     ctcb.var_0D = 3;
                     task_sleep(1);
                 }
-                //}
+            }
                 return;
             }
-
-            // interop::call(0x004DE7B0);
-            // return;
         }
     }
 }

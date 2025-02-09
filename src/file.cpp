@@ -108,9 +108,14 @@ namespace openre::file
         return interop::call<int, const char*, uint32_t*, int>(0x0043C590, path, bufferSize, mode);
     }
 
+    // 0x0043FF40
+    int tim_buffer_to_surface(int* timPtr, int page, int mode)
+    {
+        return interop::call<int, int*, int, int>(0x0043FF40, timPtr, page, mode);
+    }
+
     void file_init_hooks()
     {
-
         interop::writeJmp(0x004DD360, &osp_read);
     }
 }

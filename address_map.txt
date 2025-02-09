@@ -354,6 +354,21 @@ struct      Rdt
 declare     header                  RdtHeader
 declare     offsets                 void*[23]
 
+struct      RdtCamera
+declare     flags                   u16         0x00
+declare     perspective             u16         0x02
+declare     pos_x                   s32         0x04
+declare     pos_y                   s32         0x08
+declare     pos_z                   s32         0x0C
+declare     target_x                s32         0x10
+declare     target_y                s32         0x14
+declare     target_z                s32         0x18
+declare     offset                  u32         0x1C
+
+struct      RdtModel
+declare     texture_offset          u32         0x00
+declare     model_offset            u32         0x04
+
 struct      DoorInfo
 declare     prepacket               void*
 declare     tmd_adr                 TmdEntry*
@@ -573,6 +588,7 @@ declare     dword_988610            u32                     0x00988610
 declare     rdt                     Rdt*                    0x0098861C
 declare     dword_988620            u32                     0x00988620
 declare     mem_top                 void*                   0x00988624
+declare     dword_988628            u32                     0x00988628
 declare     dword_98862C            void*                   0x0098862C
 declare     vcut_data               VCut*[2]                0x00988630
 declare     em_damage_table_16      void*[48]               0x00988638
@@ -623,7 +639,7 @@ declare     byte_98E9A6             u8                      0x0098E9A6
 declare     byte_98E9AA             u8                      0x0098E9AA
 declare     byte_98E9AB             u8                      0x0098E9AB
 declare     word_98E9AC             s16                     0x0098E9AC
-declare     word_98E9B6             u16                     0x0098E9B6
+declare     word_98E9B6             s16                     0x0098E9B6
 declare     word_98E9BC             s16                     0x0098E9BC
 declare     word_98E9BE             s16                     0x0098E9BE
 declare     word_98E9C0             s16                     0x0098E9C0
@@ -645,7 +661,7 @@ declare     word_98EB1C             u16                     0x0098EB1C
 declare     rng                     u16                     0x0098EB1E
 declare     word_98EB20             u16                     0x0098EB20
 declare     word_98EB22             u16                     0x0098EB22
-declare     next_pld                u16                     0x0098EB24
+declare     next_pld                s16                     0x0098EB24
 declare     word_98EB26             u16                     0x0098EB26
 declare     word_98EB28             u16                     0x0098EB28
 declare     word_98EB2A             u16                     0x0098EB2A
