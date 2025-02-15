@@ -234,7 +234,7 @@ declare     sce_free3               u16
 declare     spl_flg                 u16
 declare     parts0_pos_y            u16
 declare     pT_xz                   u32
-declare     pOn_om                  s32
+declare     pOn_om                  u32
 declare     nOba                    s32
 declare     attw_timer              u8
 declare     attw_seq_no             u8
@@ -567,6 +567,7 @@ declare     enemy_init_map          void*[96]               0x0098A154
 declare     enemy_init_table        void*[192]              0x0098A2D4
 declare     enemy_init_entries      EnemyInitEntry[2]       0x0098A614
 declare     pOm                     ObjectEntity[32]        0x0098A61C
+declare     obj_ptr                 ObjectEntity*           0x0098E51C
 declare     aot_count               u8                      0x0098E528
 declare     table_start             u8                      0x0098E79C
 declare     inventory_size          u8                      0x0098E9A4
