@@ -53,6 +53,7 @@ namespace openre::scd
         SCD_AOT_SET_4P = 0x67,
         SCD_DOOR_AOT_SET_4P = 0x68,
         SCD_ITEM_AOT_SET_4P = 0x69,
+        SCD_LIGHT_POS_SET = 0x6A,
         SCD_HEAL = 0x83,
         SCD_POISON_CK = 0x86,
         SCD_POISON_CLR = 0x87,
@@ -480,6 +481,73 @@ namespace openre::scd
         return SCD_RESULT_NEXT;
     }
 
+    struct VecU8
+    {
+        uint8_t r; // 0x00
+        uint8_t g; // 0x01
+        uint8_t b; // 0x02
+    };
+
+    struct RdtLigth
+    {
+        uint16_t type[2];       // 0x00
+        VecU8 col[3];           // 0x04
+        VecU8 ambient;          // 0x0C
+        Vec16 pos[3];           // 0x10
+        uint16_t brightness[3]; // 0x22
+    };
+
+    struct LightColor
+    {
+        uint8_t r, g, b;
+    };
+
+    struct CameraLight
+    {
+        uint8_t unk_00;
+        uint8_t types[3];
+        LightColor colors[3];
+        LightColor ambient;
+        Vec16 pos[3];
+        uint16_t intensity[3];
+    };
+
+    // rdt_light_t lights[num_cameras];
+
+    struct ScdLightPosSet
+    {
+        uint8_t Opcode;
+        uint8_t var_01;
+        uint8_t LightId;
+        uint8_t Axis;     // 11 (x), 12(y) or 13(z)
+        int16_t Position; // Pos for Axis
+    };
+
+    struct ScdLightColorSet
+    {
+        uint8_t Opcode;
+        uint8_t Index;
+        uint8_t R;
+        uint8_t G;
+        uint8_t B;
+        uint8_t var_05;
+    };
+
+    // 0x004E8990
+    static int scd_light_pos_set(SceTask* sce)
+    {
+        auto opcode = reinterpret_cast<ScdLightPosSet*>(sce->data);
+        switch (opcode->Axis)
+        {
+        case 11: break;
+        case 12: break;
+        case 13: break;
+        }
+
+        sce->data += sizeof(ScdLightPosSet);
+        return SCD_RESULT_NEXT;
+    }
+
     // 0x004E5E90
     static int scd_work_set(SceTask* sce)
     {
@@ -841,6 +909,7 @@ namespace openre::scd
         set_scd_hook(SCD_SCE_BGMTBL_SET, &scd_sce_bgmtbl_set);
         set_scd_hook(SCD_CUT_BE_SET, &scd_cut_be_set);
         set_scd_hook(SCD_AOT_SET_4P, &scd_aot_set_4p);
+        // set_scd_hook(SCD_LIGHT_POS_SET, &scd_light_pos_set);
         set_scd_hook(SCD_HEAL, &scd_heal);
         set_scd_hook(SCD_POISON_CK, &scd_poison_ck);
         set_scd_hook(SCD_POISON_CLR, &scd_poison_clr);
