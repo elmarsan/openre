@@ -508,6 +508,7 @@ declare     word_691DA2             s16                     0x00691DA2
 declare     _st                     u8                      0x00691F61
 declare     itembox_state           u8                      0x00691F62
 declare     byte_691F63             u8                      0x00691F63
+declare     dword_691F64            u32                     0x00691F64
 declare     byte_691F68             u8                      0x00691F68
 declare     byte_691F69             u8                      0x00691F69
 declare     byte_691F6A             u8                      0x00691F6A
@@ -515,6 +516,14 @@ declare     inventory_cursor        u8                      0x00691F6C
 declare     inventory_cursor_2      u8                      0x00691F6D
 declare     byte_691F70             u8                      0x00691F70
 declare     byte_691F76             u8                      0x00691F76
+declare     byte_691F7C             u8                      0x00691F7C
+declare     byte_691F7D             u8                      0x00691F7D
+declare     byte_691F7E             u8                      0x00691F7E
+declare     byte_691F7F             u8                      0x00691F7F
+declare     byte_691F80             u8                      0x00691F80
+declare     byte_691F81             u8                      0x00691F81
+declare     byte_691F82             u8                      0x00691F82
+declare     byte_691F83             u8                      0x00691F83
 declare     itembox_slot_id         u8                      0x00691F84
 declare     byte_691F85             u8                      0x00691F85
 declare     byte_691F86             u8                      0x00691F86

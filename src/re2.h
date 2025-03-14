@@ -668,7 +668,7 @@ struct GameTable
     uint8_t _st;                        // 0x691F61
     uint8_t itembox_state;              // 0x691F62
     uint8_t byte_691F63;                // 0x691F63
-    uint8_t pad_691F64[4];              // 0x691F64
+    uint32_t dword_691F64;              // 0x691F64
     uint8_t byte_691F68;                // 0x691F68
     uint8_t byte_691F69;                // 0x691F69
     uint8_t byte_691F6A;                // 0x691F6A
@@ -679,7 +679,15 @@ struct GameTable
     uint8_t byte_691F70;                // 0x691F70
     uint8_t pad_691F71[5];              // 0x691F71
     uint8_t byte_691F76;                // 0x691F76
-    uint8_t pad_691F77[13];             // 0x691F77
+    uint8_t pad_691F77[5];              // 0x691F77
+    uint8_t byte_691F7C;                // 0x691F7C
+    uint8_t byte_691F7D;                // 0x691F7D
+    uint8_t byte_691F7E;                // 0x691F7E
+    uint8_t byte_691F7F;                // 0x691F7F
+    uint8_t byte_691F80;                // 0x691F80
+    uint8_t byte_691F81;                // 0x691F81
+    uint8_t byte_691F82;                // 0x691F82
+    uint8_t byte_691F83;                // 0x691F83
     uint8_t itembox_slot_id;            // 0x691F84
     uint8_t byte_691F85;                // 0x691F85
     uint8_t byte_691F86;                // 0x691F86
