@@ -32,6 +32,7 @@ namespace openre
         ITEM_TYPE_SHOTGUN_PARTS = 34,
         ITEM_TYPE_FIRST_AID_SPRAY = 35,
         ITEM_TYPE_ANTI_VIRUS_BOMB = 36,
+        ITEM_TYPE_37 = 37,
         ITEM_TYPE_HERB_G = 38,
         ITEM_TYPE_HERB_R = 39,
         ITEM_TYPE_HERB_B = 40,
