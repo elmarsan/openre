@@ -41,6 +41,22 @@ namespace openre::hud
         INVENTORY_ITEM_HIDE_COMMAND_BOX,
     };
 
+    enum
+    {
+        INVENTORY_MIX_ITEM_MOVE_GREEN_CURSOR,
+        INVENTORY_MIX_ITEM_1,
+        INVENTORY_MIX_ITEM_2,
+        INVENTORY_MIX_ITEM_3,
+        INVENTORY_MIX_ITEM_4,
+        INVENTORY_MIX_ITEM_5,
+        INVENTORY_MIX_ITEM_6,
+        INVENTORY_MIX_ITEM_7,
+        INVENTORY_MIX_ITEM_8,
+        INVENTORY_MIX_ITEM_9,
+        INVENTORY_MIX_ITEM_10,
+        INVENTORY_MIX_ITEM_11,
+    };
+
     using Action = void (*)();
 
     static Action* gHudImplTable = (Action*)0x5402C0;
@@ -892,70 +908,75 @@ namespace openre::hud
         auto& redCursor = gGameTable.inventory_cursor;
         auto& greenCursor = gGameTable.inventory_cursor_2;
         const auto inventorySize = gGameTable.inventory_size;
-        const auto oldGreenCursor = greenCursor;
 
         auto& redItem = gGameTable.inventory[redCursor];
         auto& greenItem = gGameTable.inventory[greenCursor];
 
         auto mixQuantity = redItem.Quantity + greenItem.Quantity;
 
-        auto v2 = greenCursor;
-
         gGameTable.byte_691F76 = 0;
         switch (gGameTable.byte_691F64)
         {
-        case 0:
+        case INVENTORY_MIX_ITEM_MOVE_GREEN_CURSOR:
         {
-            if ((gGameTable.fg_system & 0x80000000))
-            {
-                goto LABEL_30;
-            }
-            if (gGameTable.word_9885FC & 0x2000 && greenCursor < inventorySize - 1)
-            {
-                if (greenItem.Part == 1)
-                {
-                    v2 = greenCursor + 1;
-                }
-                greenCursor = ++v2;
-            }
-            if (gGameTable.word_9885FC & 0x8000 && v2 && v2 != 10)
-            {
-                if (gGameTable.inventory[v2].Part == 2)
-                {
-                    v2 = v2 == 1 ? 2 : v2 - 1;
-                }
-                greenCursor = --v2;
-            }
-            if (!(gGameTable.word_9885FC & 0x4000))
-            {
-                goto LABEL_22;
-            }
-            if (v2 >= inventorySize - 2)
-            {
-                if (v2 != 10)
-                {
-                    goto LABEL_22;
-                }
-                v2 = 1;
-            }
-            else
-            {
-                v2 += 2;
-            }
-            greenCursor = v2;
+            // interop::call(0x004F88B0);
+            // return;
 
-        LABEL_22:
-            if (gGameTable.word_9885FC & 0x1000 && v2 != 10)
+            // TODO: Get rid of v1?
+            auto v1 = greenCursor;
+            auto oldGreenCursor = greenCursor;
+
+            if (gGameTable.fg_system & 0x80000000)
             {
-                v2 = v2 <= 1 ? 10 : v2 - 2;
-                greenCursor = v2;
+                // Right
+                if (gGameTable.word_9885FC & 0x2000 && greenCursor < inventorySize - 1)
+                {
+                    if (greenItem.Part == 1)
+                    {
+                        greenCursor++;
+                    }
+                    greenCursor++;
+                }
+                // Left
+                if (gGameTable.word_9885FC & 0x8000 && greenCursor && greenCursor != 10)
+                {
+                    if (gGameTable.inventory[greenCursor].Part == 2)
+                    {
+                        // v1 = v1 == 1 ? 2 : v1 - 1;
+                        greenCursor--;
+                    }
+                    greenCursor--;
+                    // greenCursor = --v1;
+                }
+                // Down
+                if (gGameTable.word_9885FC & 0x4000)
+                {
+                    if (v1 >= inventorySize - 2)
+                    {
+                        if (v1 == 10)
+                        {
+                            v1 = 1;
+                            greenCursor = v1;
+                        }
+                    }
+                    else
+                    {
+                        v1 += 2;
+                        greenCursor = v1;
+                    }
+                }
+                // Up
+                if (gGameTable.word_9885FC & 0x1000 && v1 != 10)
+                {
+                    v1 = v1 <= 1 ? 10 : v1 - 2;
+                    greenCursor = v1;
+                }
+                if (oldGreenCursor != v1)
+                {
+                    snd_se_on(0x4040000);
+                    v1 = greenCursor;
+                }
             }
-            if (oldGreenCursor != v2)
-            {
-                snd_se_on(0x4040000);
-                v2 = greenCursor;
-            }
-        LABEL_30:
             if (gGameTable.key_trg & 0x1000)
             {
                 gGameTable.byte_691F64 = hud_check_item_mix();
@@ -979,14 +1000,17 @@ namespace openre::hud
                 gGameTable.byte_691F63 = 0;
                 gGameTable.byte_691F64 = 0;
             }
-            v2 = greenCursor;
+            v1 = greenCursor;
         LABEL_37:
-            st_disp_cursol1(gGameTable.inventory[v2].Part);
+            st_disp_cursol1(gGameTable.inventory[v1].Part);
             hud_render_inventory_text(16, 175, 2, gGameTable.inventory[greenCursor].Type);
             break;
         }
-        case 1:
+        case INVENTORY_MIX_ITEM_1:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             if (gGameTable.byte_691F65++ < 10)
             {
                 gGameTable.byte_691F7E += gGameTable.byte_691F7C;
@@ -1015,8 +1039,11 @@ namespace openre::hud
             }
             break;
         }
-        case 2:
+        case INVENTORY_MIX_ITEM_2:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             if (gGameTable.byte_691F65++ >= 4)
             {
                 auto slotId = search_item(ITEM_TYPE_NONE);
@@ -1054,8 +1081,11 @@ namespace openre::hud
             }
             break;
         }
-        case 3:
+        case INVENTORY_MIX_ITEM_3:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             if (!(gGameTable.byte_691F65++))
             {
                 show_message(0xAF0010, 0xE400, 2, 0);
@@ -1072,8 +1102,11 @@ namespace openre::hud
             }
             break;
         }
-        case 4:
+        case INVENTORY_MIX_ITEM_4:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             gGameTable.inventory[redCursor].Type = gGameTable.byte_691F86;
             gGameTable.inventory[redCursor].Quantity = gGameTable.item_def_tbl[gGameTable.byte_691F86].max;
             if (redCursor == gGameTable.byte_691F68)
@@ -1092,8 +1125,11 @@ namespace openre::hud
             check_cursol_distance(0);
             break;
         }
-        case 5:
+        case INVENTORY_MIX_ITEM_5:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             auto item = gGameTable.inventory[redCursor];
             auto itemDef = gGameTable.item_def_tbl[item.Type];
 
@@ -1128,8 +1164,11 @@ namespace openre::hud
             }
             break;
         }
-        case 6:
+        case INVENTORY_MIX_ITEM_6:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             auto itemDef = gGameTable.item_def_tbl[greenItem.Type];
 
             if (greenItem.Quantity < itemDef.max || greenItem.Type >= ITEM_TYPE_AMMO_HANDGUN)
@@ -1164,8 +1203,11 @@ namespace openre::hud
             }
             break;
         }
-        case 7:
+        case INVENTORY_MIX_ITEM_7:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             auto auxRedType = redItem.Type;
             redItem.Type = greenItem.Type - 15;
             if (gGameTable.byte_691F68 == redCursor)
@@ -1178,8 +1220,11 @@ namespace openre::hud
             greenItem.Quantity = auxRedQuantity;
             break;
         }
-        case 8:
+        case INVENTORY_MIX_ITEM_8:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             auto auxGreenType = greenItem.Type;
             greenItem.Type = redItem.Type - 15;
             if (gGameTable.byte_691F6A == greenCursor)
@@ -1200,8 +1245,11 @@ namespace openre::hud
             check_cursol_distance(1);
             break;
         }
-        case 9:
+        case INVENTORY_MIX_ITEM_9:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
             auto type = greenItem.Type;
             if (greenItem.Type == ITEM_TYPE_ANTI_VIRUS_BOMB)
             {
@@ -1228,8 +1276,43 @@ namespace openre::hud
             check_cursol_distance(0);
             break;
         }
-        case 11:
+        case INVENTORY_MIX_ITEM_10:
         {
+            // interop::call(0x004F88B0);
+            // return;
+
+            auto type = redItem.Type;
+            if (greenItem.Type == ITEM_TYPE_ANTI_VIRUS_BOMB)
+            {
+                type = ITEM_TYPE_AMMO_FLAME_ROUNDS;
+            }
+            if (greenItem.Type == ITEM_TYPE_37)
+            {
+                type = ITEM_TYPE_AMMO_SMG;
+            }
+            if (redItem.Quantity > 6)
+            {
+                greenItem.Quantity -= 6;
+                redItem.Type = type;
+                redItem.Quantity = 6;
+            }
+            else
+            {
+                greenItem.Type = type;
+                set_inventory_item(redCursor, 0, 0, 0);
+            }
+            gGameTable.byte_691F64 = 1;
+            gGameTable.byte_691F65 = 0;
+            gGameTable.byte_691F66 = 0;
+            check_cursol_distance(0);
+            break;
+        }
+        case INVENTORY_MIX_ITEM_11:
+        {
+            // interop::call(0x004F88B0);
+            // return;
+
+            // Will you mix items?
             if (gGameTable.byte_691F65)
             {
                 if (gGameTable.fg_message >= 0)
