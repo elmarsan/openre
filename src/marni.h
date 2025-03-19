@@ -9,4 +9,6 @@ namespace openre::marni
     void unload_door_texture();
     bool sub_442E40();
     void unload_texture_page(int page);
+
+    void marni_init_hooks();
 }

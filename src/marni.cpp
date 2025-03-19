@@ -2,6 +2,9 @@
 #include "interop.hpp"
 #include "re2.h"
 
+#include <ddraw.h>
+#include <windows.h>
+
 namespace openre::marni
 {
     // 0x00443620
@@ -11,9 +14,7 @@ namespace openre::marni
     }
 
     // 0x004DBFD0
-    void out()
-    {
-    }
+    void out() {}
 
     // 0x00432BB0
     void unload_door_texture()
@@ -33,5 +34,29 @@ namespace openre::marni
     void unload_texture_page(int page)
     {
         interop::call<void, int>(0x0043F550, page);
+    }
+
+    // 0x00406450
+    static void marni_move(Marni* marni)
+    {
+        HWND window = (HWND)marni->hWnd;
+        RECT rect = {};
+        rect.left = marni->window_rect[0];
+        rect.top = marni->window_rect[1];
+        rect.right = marni->window_rect[2];
+        rect.bottom = marni->window_rect[3];
+
+        POINT point1 = {};
+        ClientToScreen(window, &point1);
+        POINT point2 = {};
+        point2.x = marni->resolutions[marni->modes].width;
+        point2.y = marni->resolutions[marni->modes].height;
+        ClientToScreen(window, &point2);
+        SetRect(&rect, point1.x, point2.y, point2.x, point2.y);
+    }
+
+    void marni_init_hooks()
+    {
+        interop::writeJmp(0x00406450, marni_move);
     }
 }
