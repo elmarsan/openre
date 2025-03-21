@@ -35,6 +35,7 @@ namespace openre::scd
         SCD_IFEL_CK = 0x06,
         SCD_ELSE_CK = 0x07,
         SCD_END_IF = 0x08,
+        SCD_SLEEP = 0x09,
         SCD_SCE_RND = 0x28,
         SCD_CUT_CH = 0x29,
         SCD_CUT_OLD = 0x2A,
@@ -270,6 +271,13 @@ namespace openre::scd
         uint16_t flag;
         uint8_t md1;
         uint8_t action;
+    };
+
+    struct ScdSleep
+    {
+        uint8_t opcode;
+        uint8_t var_01;
+        uint16_t count;
     };
 
     constexpr uint8_t SAT_4P = (1 << 7);
@@ -894,6 +902,16 @@ namespace openre::scd
         return SCD_RESULT_NEXT;
     }
 
+    // 0x004E4580
+    static int scd_sleep(SceTask* sce)
+    {
+        auto opcode = reinterpret_cast<ScdSleep*>(sce->data);
+        sce->data = &opcode->var_01;
+        sce->loop_ctr[sce->sub_ctr]++;
+        sce->lcnt[sce->sub_ctr] = opcode->count;
+        return SCD_RESULT_NEXT;
+    }
+
     static void set_scd_hook(ScdOpcode opcode, ScdOpcodeImpl impl)
     {
         gScdImplTable[opcode] = impl;
@@ -914,6 +932,7 @@ namespace openre::scd
         set_scd_hook(SCD_IFEL_CK, &scd_ifel_ck);
         set_scd_hook(SCD_ELSE_CK, &scd_else_ck);
         set_scd_hook(SCD_END_IF, &scd_end_if);
+        set_scd_hook(SCD_SLEEP, &scd_sleep);
         set_scd_hook(SCD_SCE_RND, &scd_sce_rnd);
         set_scd_hook(SCD_CUT_CH, &scd_cut_ch);
         set_scd_hook(SCD_CUT_OLD, &scd_cut_old);
