@@ -756,5 +756,7 @@ struct      Marni
 declare     modes                   u32                    0x008C7018
 declare     window_rect             u32[4]                 0x008C7CDC
 declare     hWnd                    void*                  0x008C7EA8
+declare     is_gpu_busy             u32                    0x008C7EE8
 declare     resolutions             MarniRes[64]           0x008C7EF8
+declare     gpu_flag                u32                    0x008C83F4
 declare     var_8C846C              u32                    0x008C846C

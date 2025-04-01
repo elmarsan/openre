@@ -1028,9 +1028,13 @@ struct Marni
     uint32_t window_rect[4];            // 0x8C7CDC
     uint8_t pad_8C7CEC[444];            // 0x8C7CEC
     void* hWnd;                         // 0x8C7EA8
-    uint8_t pad_8C7EAC[76];             // 0x8C7EAC
+    uint8_t pad_8C7EAC[60];             // 0x8C7EAC
+    uint32_t is_gpu_busy;               // 0x8C7EE8
+    uint8_t pad_8C7EEC[12];             // 0x8C7EEC
     MarniRes resolutions[64];           // 0x8C7EF8
-    uint8_t pad_8C82F8[372];            // 0x8C82F8
+    uint8_t pad_8C82F8[252];            // 0x8C82F8
+    uint32_t gpu_flag;                  // 0x8C83F4
+    uint8_t pad_8C83F8[116];            // 0x8C83F8
     uint32_t var_8C846C;                // 0x8C846C
 };
 static_assert(sizeof(Marni) == 0x8C8470);

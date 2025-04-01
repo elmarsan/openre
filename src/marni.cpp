@@ -72,8 +72,63 @@ namespace openre::marni
         marni->window_rect[3] = rect.bottom;
     }
 
+    // 0x004065C0
+    static void marni_resize(Marni* marni, HWND window, uint32_t message, WPARAM wParam, LPARAM lParam)
+    {
+        interop::call<void, Marni*, HWND, uint32_t, WPARAM, LPARAM>(0x004065C0, marni, window, message, wParam, lParam);
+    }
+
+    // 0x004064D0
+    static void marni_destroy(Marni* marni)
+    {
+        interop::call<void, Marni*>(0x004064D0, marni);
+    }
+
+    // 0x00401F10
+    static void marni_syskeydown(Marni* marni)
+    {
+        interop::call<void, Marni*>(0x00401F10, marni);
+    }
+
+    // 0x004063D0
+    static int marni_message(Marni* marni, HWND window, uint32_t message, WPARAM wParam, LPARAM lParam)
+    {
+        switch (message)
+        {
+        case WM_SIZE:
+        {
+            if (!marni->is_gpu_busy)
+            {
+                marni_resize(marni, window, message, wParam, lParam);
+            }
+            break;
+        }
+        case WM_DESTROY:
+        {
+            marni_destroy(marni);
+            break;
+        }
+        case WM_MOVE:
+        {
+            marni_move(marni);
+            break;
+        }
+        case WM_SYSKEYDOWN:
+        {
+            if (marni->gpu_flag & 0x4000)
+            {
+                marni_syskeydown(marni);
+            }
+            break;
+        }
+        }
+
+        return 1;
+    }
+
     void marni_init_hooks()
     {
-        interop::hookThisCall(0x00406450, marni_move);
+        interop::hookThisCall(0x00406450, &marni_move);
+        interop::hookThisCall(0x004063D0, &marni_message);
     }
 }
