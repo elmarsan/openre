@@ -48,6 +48,24 @@ namespace openre::marni
         interop::call<void, int>(0x00432CD0, doorId);
     }
 
+    // 0x00404FA0
+    static void clear_buffers(Marni* marni)
+    {
+        interop::call<void, Marni*>(0x00404FA0, marni);
+    }
+
+    // 0x00403F30
+    static int init_all(Marni* marni)
+    {
+        return interop::call<int, Marni*>(0x00403F30, marni);
+    }
+
+    // 0x00402940
+    static int restore_surfaces(Marni* marni)
+    {
+        return interop::call<int, Marni*>(0x00402940, marni);
+    }
+
     // 0x00406450
     static void marni_move(Marni* marni)
     {
@@ -72,8 +90,72 @@ namespace openre::marni
         marni->window_rect[3] = rect.bottom;
     }
 
+    // 0x00403220
+    static int marni_change_mode(Marni* marni, uint32_t width, uint32_t height, int fullscreen)
+    {
+        if ((marni->gpu_flag & 0x200) == 0)
+        {
+            return 0;
+        }
+        if (marni->gpu_flag & 0x2000)
+        {
+            marni->aspect_x = 1;
+            marni->aspect_y = 1;
+        }
+        else
+        {
+            marni->aspect_x = width / marni->render_width;
+            marni->aspect_y = height / marni->render_height;
+        }
+        marni->size_x_old = marni->size_x;
+        marni->size_y_old = marni->size_y;
+        marni->is_fullscreen_old = marni->bbp;
+        marni->field_8C7EC0 = (marni->gpu_flag >> 10) & 1;
+        marni->size_x = width;
+        marni->size_y = height;
+        marni->bbp = fullscreen;
+        clear_buffers(marni);
+        if (!init_all(marni))
+        {
+            out();
+            out();
+            marni->size_x = marni->size_x_old;
+            marni->size_y = marni->size_y_old;
+            marni->bbp = marni->is_fullscreen_old;
+            out();
+            clear_buffers(marni);
+            if (!init_all(marni))
+            {
+                out();
+                clear_buffers(marni);
+                return 0;
+            }
+        }
+
+        if (!restore_surfaces(marni))
+        {
+            out();
+            out();
+            marni->size_x = marni->size_x_old;
+            marni->size_y = marni->size_y_old;
+            marni->bbp = marni->is_fullscreen_old;
+            out();
+            clear_buffers(marni);
+            if (!init_all(marni) || restore_surfaces(marni))
+            {
+                out();
+                clear_buffers(marni);
+                return 0;
+            }
+        }
+
+        marni->gpu_flag |= 2;
+        return 1;
+    }
+
     void marni_init_hooks()
     {
-        interop::hookThisCall(0x00406450, marni_move);
+        interop::hookThisCall(0x00406450, &marni_move);
+        interop::hookThisCall(0x00403220, &marni_change_mode);
     }
 }

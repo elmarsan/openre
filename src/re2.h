@@ -1028,9 +1028,24 @@ struct Marni
     uint32_t window_rect[4];            // 0x8C7CDC
     uint8_t pad_8C7CEC[444];            // 0x8C7CEC
     void* hWnd;                         // 0x8C7EA8
-    uint8_t pad_8C7EAC[76];             // 0x8C7EAC
+    uint32_t render_width;              // 0x8C7EAC
+    uint32_t render_height;             // 0x8C7EB0
+    uint32_t size_x_old;                // 0x8C7EB4
+    uint32_t size_y_old;                // 0x8C7EB8
+    uint32_t is_fullscreen_old;         // 0x8C7EBC
+    uint32_t field_8C7EC0;              // 0x8C7EC0
+    uint8_t pad_8C7EC4[16];             // 0x8C7EC4
+    uint32_t aspect_x;                  // 0x8C7ED4
+    uint32_t aspect_y;                  // 0x8C7ED8
+    uint8_t pad_8C7EDC[28];             // 0x8C7EDC
     MarniRes resolutions[64];           // 0x8C7EF8
-    uint8_t pad_8C82F8[372];            // 0x8C82F8
+    uint8_t pad_8C82F8[52];             // 0x8C82F8
+    uint32_t size_x;                    // 0x8C832C
+    uint32_t size_y;                    // 0x8C8330
+    uint32_t bbp;                       // 0x8C8334
+    uint8_t pad_8C8338[188];            // 0x8C8338
+    uint32_t gpu_flag;                  // 0x8C83F4
+    uint8_t pad_8C83F8[116];            // 0x8C83F8
     uint32_t var_8C846C;                // 0x8C846C
 };
 static_assert(sizeof(Marni) == 0x8C8470);
