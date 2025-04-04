@@ -448,14 +448,18 @@ struct      EnemyInitEntry
 declare     type                    u16
 declare     enabled                 u16
 
+struct      InputDevice
+declare     raw_state               u32
+declare     enabled                 u32                     0x1D4
+
 struct      Input
-declare     mapping                 u8[31]
-declare     keyboard_raw_state      u32                     0x24
-declare     var_1F8                 u32                     0x1F8
-declare     gamepad_raw_state       u32                     0x1FC
-declare     var_3D0                 u32                     0x3D0
-declare     var_3B24                u32                     0x3B24
-declare     keyboard                u32                     0x3B28
+declare     mapping                 u8[32]
+declare     var_04                  u32
+declare     keyboard                InputDevice
+declare     gamepad                 InputDevice
+declare     dummy_gamepads          InputDevice[30]
+declare     num_devices             u32
+declare     state                   u32
 
 struct      DemoPlayer
 declare     stage_no                u8

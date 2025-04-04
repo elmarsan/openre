@@ -565,19 +565,23 @@ struct EnemyInitEntry
 };
 static_assert(sizeof(EnemyInitEntry) == 0x04);
 
+struct InputDevice
+{
+    uint32_t raw_state;                 // 0x0000
+    uint8_t pad_0004[464];              // 0x0004
+    uint32_t enabled;                   // 0x01D4
+};
+static_assert(sizeof(InputDevice) == 0x1D8);
+
 struct Input
 {
-    uint8_t mapping[31];                // 0x0000
-    uint8_t pad_001F[5];                // 0x001F
-    uint32_t keyboard_raw_state;        // 0x0024
-    uint8_t pad_0028[464];              // 0x0028
-    uint32_t var_1F8;                   // 0x01F8
-    uint32_t gamepad_raw_state;         // 0x01FC
-    uint8_t pad_0200[464];              // 0x0200
-    uint32_t var_3D0;                   // 0x03D0
-    uint8_t pad_03D4[14160];            // 0x03D4
-    uint32_t var_3B24;                  // 0x3B24
-    uint32_t keyboard;                  // 0x3B28
+    uint8_t mapping[32];                // 0x0000
+    uint32_t var_04;                    // 0x0020
+    InputDevice keyboard;               // 0x0024
+    InputDevice gamepad;                // 0x01FC
+    InputDevice dummy_gamepads[30];     // 0x03D4
+    uint32_t num_devices;               // 0x3B24
+    uint32_t state;                     // 0x3B28
 };
 static_assert(sizeof(Input) == 0x3B2C);
 

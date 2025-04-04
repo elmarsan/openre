@@ -1,5 +1,6 @@
 #include "input.h"
 #include "interop.hpp"
+#include "marni.h"
 #include "openre.h"
 
 #include <cstdint>
@@ -75,7 +76,7 @@ namespace openre::input
         {
             if (keyCode == gGameTable.input.mapping[i])
             {
-                gGameTable.input.keyboard &= ~(1 << i);
+                gGameTable.input.state &= ~(1 << i);
             }
         }
     }
@@ -87,7 +88,7 @@ namespace openre::input
         {
             if (keyCode == gGameTable.input.mapping[i])
             {
-                gGameTable.input.keyboard |= (1 << i);
+                gGameTable.input.state |= (1 << i);
             }
         }
     }
@@ -95,7 +96,7 @@ namespace openre::input
     // 0x00410400
     int input_get_some_byte()
     {
-        return gGameTable.input.keyboard;
+        return gGameTable.input.state;
     }
 
     static uint32_t input_keyboard_data[32] = {
@@ -140,20 +141,21 @@ namespace openre::input
     // 0x0043BB00
     int sub_43BB00()
     {
+        auto& input = gGameTable.input;
         auto v1 = gGameTable.dword_66D394;
 
         joy_get_pos_ex(gGameTable.input.mapping);
-        if (gGameTable.input.var_1F8 != 0)
+        if (input.keyboard.enabled)
         {
-            v1 = get_input_device_state(gGameTable.input.keyboard_raw_state, INPUT_DEVICE_KEYBOARD);
+            v1 = get_input_device_state(input.keyboard.raw_state, INPUT_DEVICE_KEYBOARD);
 
-            gGameTable.dword_99CF64 = gGameTable.input.keyboard_raw_state;
+            gGameTable.dword_99CF64 = input.keyboard.raw_state;
             gGameTable.dword_66D394 = v1;
         }
         gGameTable.dword_99CF70 = 0;
-        if (gGameTable.input.var_3B24 >= 2 && gGameTable.input.var_3D0 != 0)
+        if (input.num_devices >= 2 && input.gamepad.enabled)
         {
-            auto v2 = get_input_device_state(gGameTable.input.gamepad_raw_state, INPUT_DEVICE_GAMEPAD);
+            auto v2 = get_input_device_state(input.gamepad.raw_state, INPUT_DEVICE_GAMEPAD);
             v1 |= v2;
             gGameTable.dword_99CF70 = v2;
             gGameTable.dword_66D394 = v1;
