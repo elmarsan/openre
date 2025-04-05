@@ -611,8 +611,8 @@ static_assert(sizeof(DemoPlayer) == 0x746);
 struct GameTable
 {
     uint8_t pad_0000[5370256];          // 0x0000
-    char* aIIIdDSNDD;                   // 0x51F190
-    uint8_t pad_51F194[23842];          // 0x51F194
+    uint8_t aIIIdDSNDD[43];             // 0x51F190
+    uint8_t pad_51F1BB[23803];          // 0x51F1BB
     bool enable_dsound;                 // 0x524EB6
     uint8_t pad_524EB7[4261];           // 0x524EB7
     Mat16 door_ll;                      // 0x525F5C

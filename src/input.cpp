@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "input.h"
 #include "interop.hpp"
 #include "marni.h"
@@ -169,9 +171,12 @@ namespace openre::input
         return v1;
     }
 
+    static const char* gamepadInfoStr = "ジョイスティックＩＤ%d番は、%sボタンの数 %d 軸の数%d ";
+
     // 0x004102E0
     static void input_init(Input* input)
     {
+        // First is keyboard
         input->num_devices = 1 + joyGetNumDevs();
         std::memset(&input->keyboard, 0, sizeof(InputDevice) * 32);
         // At least one gamepad connected
@@ -181,12 +186,13 @@ namespace openre::input
             JOYINFOEX joyInfo;
 
             joyGetDevCapsA(0, joycapsa, sizeof(JOYCAPSA));
+            std::memset(&input->gamepad, 0, 0x34);
             input->gamepad.raw_state = 0x34;
             input->gamepad.var_04 = 0xFF;
             if (joyGetPosEx(0, &joyInfo) == JOYERR_NOERROR)
             {
                 char buffer[1024];
-                sprintf(buffer, gGameTable.aIIIdDSNDD, 0, joycapsa->szPname, joycapsa->wNumButtons, joycapsa->wMaxAxes);
+                sprintf(buffer, gamepadInfoStr, 0, joycapsa->szPname, joycapsa->wNumButtons, joycapsa->wMaxAxes);
                 marni::out();
             }
             else
