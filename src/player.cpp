@@ -152,7 +152,6 @@ namespace openre::player
         case Routine::QUICKTURN:
             gPlayerEntity.routine_0 = 1;
             gPlayerEntity.routine_1 = 0xC;
-
             break;
         case Routine::PUSH_OBJECT:
             gPlayerEntity.routine_0 = 1;
@@ -266,31 +265,6 @@ namespace openre::player
         loc_4FC3FD();
     }
 
-    // 0x005024D0
-    static int set_inventory_item(int slotId, int type, int quantity, int part)
-    {
-        gGameTable.inventory[slotId].Type = type;
-        gGameTable.inventory[slotId].Quantity = quantity;
-        gGameTable.inventory[slotId].Part = part;
-        return slotId;
-    }
-
-    // 0x00502500
-    static void set_inventory_item_quantity(int slotId, int quantity)
-    {
-        gGameTable.inventory[slotId].Quantity = quantity;
-
-        auto part = gGameTable.inventory[slotId].Part;
-        if (part == 1)
-        {
-            gGameTable.inventory[slotId + 1].Quantity = quantity;
-        }
-        if (part == 2)
-        {
-            gGameTable.inventory[slotId].Quantity = quantity;
-        }
-    }
-
     // 0x004DABC0
     static int pl_neck(int a1, int a2)
     {
@@ -355,6 +329,18 @@ namespace openre::player
         return p(a0);
     }
 
+    // 0x004D49C0
+    static void pl_water(PlayerEntity* player)
+    {
+        interop::call<void, PlayerEntity*>(0x004D49C0, player);
+    }
+
+    // 0x004CEDE0
+    static void oma_ob_pull2(PlayerEntity* player, int a1, uint16_t a2, uint32_t a3)
+    {
+        interop::call<void, PlayerEntity*, int, uint16_t, uint32_t>(0x004CEDE0, player, a1, a2, a3);
+    }
+
     // 0x004D9940
     static int pl_init(PlayerEntity* player)
     {
@@ -367,6 +353,12 @@ namespace openre::player
     static int foot_set_pl(PlayerEntity* player, int a1, int a2)
     {
         return interop::call<int, PlayerEntity*, int, int>(0x004B2B00, player, a1, a2);
+    }
+
+    // 0x004E2AE0
+    static int sca_ck_hit(Vec32* vec, int a1, int a2, int a3)
+    {
+        return interop::call<int, Vec32*, int, int, int>(0x004E2AE0, vec, a1, a2, a3);
     }
 
     // 0x004D9D20
@@ -670,7 +662,7 @@ namespace openre::player
             }
             if ((key_trg & input::KEY_TYPE_128) != 0)
             {
-                set_flag(FlagGroup::Status, FG_STATUS_10, true);
+                set_flag(FlagGroup::Status, FG_STATUS_INTERACT, true);
             }
             if (key & input::KEY_TYPE_AIM && player->type & 0xFFF)
             {
@@ -779,7 +771,7 @@ namespace openre::player
         {
             if (key_trg & input::KEY_TYPE_128)
             {
-                set_flag(FlagGroup::Status, FG_STATUS_10, true);
+                set_flag(FlagGroup::Status, FG_STATUS_INTERACT, true);
             }
         LABEL_31:
             if (key & input::KEY_TYPE_AIM && player->type & 0xFFF)
@@ -816,7 +808,7 @@ namespace openre::player
         {
             if (key_trg & input::KEY_TYPE_128)
             {
-                set_flag(FlagGroup::Status, FG_STATUS_10, true);
+                set_flag(FlagGroup::Status, FG_STATUS_INTERACT, true);
             }
 
         LABEL_25:
@@ -865,12 +857,199 @@ namespace openre::player
             }
             if (key_trg & input::KEY_TYPE_128)
             {
-                set_flag(FlagGroup::Status, FG_STATUS_10, true);
+                set_flag(FlagGroup::Status, FG_STATUS_INTERACT, true);
             }
         }
         if (key & input::KEY_TYPE_AIM && player->type & 0xFFF)
         {
             set_routine(Routine::AIM);
+        }
+    }
+
+    // 0x004DB930
+    void pl_br_step_down(PlayerEntity* player, uint32_t key, uint32_t key_trg)
+    {
+        if (player->routine_3 <= 4)
+        {
+            // Play step down animation
+            return;
+        }
+        // End step down animation
+        if (key & input::KEY_TYPE_FORWARD)
+        {
+            set_routine(Routine::FORWARD);
+            if (key & input::KEY_TYPE_RUN_AND_CANCEL)
+            {
+                set_routine(Routine::RUN_FORWARD);
+            }
+        }
+        if (key & input::KEY_TYPE_BACKWARD)
+        {
+            set_routine(Routine::BACKWARD);
+        }
+        if (key & input::KEY_TYPE_ROTATE)
+        {
+            set_routine(Routine::ROTATE);
+        }
+        if (key_trg & input::KEY_TYPE_128)
+        {
+            set_flag(FlagGroup::Status, FG_STATUS_INTERACT, true);
+            if (player->Sca_info & 0x100000)
+            {
+                sca_hit_stairs(player, 450, gGameTable.dword_695E7C);
+            }
+        }
+        if ((key & input::KEY_TYPE_AIM) && (player->type & 0xFFF))
+        {
+            set_routine(Routine::AIM);
+        }
+    }
+
+    // 0x004DB9D0
+    void pl_mv_step_down(PlayerEntity* player, Emr* emr, Edd* edd)
+    {
+        switch (player->routine_3)
+        {
+        case 0:
+        {
+            player->routine_3 = 1;
+            player->be_flg |= 4;
+            player->move_no = 7;
+            player->move_cnt = 0;
+            player->hokan_flg = 7;
+            player->mplay_flg = 0;
+            [[fallthrough]];
+        }
+        case 1:
+        {
+            player->routine_3 += joint_move(player, (Emr*)player->field_190, (Edd*)player->field_194, 512);
+            if (player->id == PLD_SHERRY)
+            {
+                if (player->move_cnt == 26)
+                {
+                    player->routine_3 = 2;
+                }
+            }
+            else if (player->move_cnt == 14)
+            {
+                player->routine_3 = 2;
+            }
+            return;
+        }
+        case 2:
+        {
+            player->damage_cnt |= 0x80;
+            player->routine_3 = 3;
+            player->move_no = 8;
+            player->move_cnt = 0;
+            player->hokan_flg = 0;
+            player->mplay_flg = 0;
+            player->spd.x = 1000;
+            player->m.pos.y += 550;
+            player->timer0 = 5;
+            if (player->id == PLD_SHERRY)
+            {
+                player->spd.x = 600;
+                player->m.pos.y -= 400;
+                player->timer0 = 3;
+            }
+            player->spd.z = 0;
+            add_speed_xz(player, 0);
+            player->nFloor--;
+            player->sca_old_x = player->m.pos.x;
+            player->sca_old_z = player->m.pos.z;
+            player->timer0 = 3;
+            [[fallthrough]];
+        }
+        case 3:
+        {
+            player->m.pos.y += 30 * player->timer0++;
+            player->ground = sca_ck_hit(&player->m.pos, player->atd[0].at_w, 0x8000, 0);
+            player->nFloor = compute_nfloor(player->m.pos.y);
+
+            if ((uint32_t)&gGameTable.obj_ptr > (uint32_t)&gGameTable.pOm)
+            {
+                auto objIdx = ((uint32_t)&gGameTable.obj_ptr - (uint32_t)&gGameTable.pOm) / sizeof(ObjectEntity);
+                for (uint32_t i = 0; i < objIdx; i++)
+                {
+                    auto& obj = gGameTable.pOm[i];
+                    if (obj.be_flg & 1 && !(obj.be_flg & 2))
+                    {
+                        oma_set_ofs(&obj);
+                        omd_in_check(&player->m.pos, &obj, player->atd[0].at_w, 0);
+
+                        if (player->ground == obj.atd[0].pos.y - obj.atd[0].at_h)
+                        {
+                            player->pOn_om = (uint32_t)&obj;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (player->pOn_om)
+            {
+                oma_ob_pull2(&gGameTable.pl, player->pOn_om, static_cast<uint16_t>(player->sc_id << 8), 0x30);
+            }
+            joint_move(player, (Emr*)player->field_190, (Edd*)player->field_194, 512);
+            if (player->water < player->ground && !player->timer3)
+            {
+                player->timer3 = -123;
+            }
+            if (player->timer3 & 0x7F)
+            {
+                player->timer3--;
+                pl_water(player);
+            }
+            if (player->m.pos.y > player->ground - 300)
+            {
+                player->routine_3 = 4;
+            }
+            return;
+        }
+        case 4:
+        {
+            player->routine_3 = 5;
+            player->move_no = 9;
+            if ((player->routine_2 & 0xC) > 4)
+            {
+                player->move_no = 7;
+            }
+            player->move_cnt = 4;
+            player->hokan_flg = 7;
+            player->m.pos.y = player->ground;
+            player->damage_cnt &= 0x7F;
+            player->be_flg = (player->be_flg << 8) | (player->be_flg & 0xFB);
+            snd_se_walk(1, 4, player);
+            gGameTable.word_989EEE |= 4;
+            [[fallthrough]];
+        }
+        case 5:
+        {
+            if (player->move_cnt == 6)
+            {
+                snd_se_walk(1, 7, player);
+            }
+            player->nFloor = compute_nfloor(player->m.pos.y);
+            if (player->pOn_om)
+            {
+                oma_ob_pull2(&gGameTable.pl, player->pOn_om, static_cast<uint16_t>(player->sc_id << 8), 0x30);
+            }
+            player->routine_3 += joint_move(player, (Emr*)player->field_190, (Edd*)player->field_194, 512);
+            return;
+        }
+        case 6:
+        {
+            set_flag(FlagGroup::Status, FG_STATUS_25, false);
+            if (player->pOn_om)
+            {
+                oma_ob_pull2(&gGameTable.pl, player->pOn_om, static_cast<uint16_t>(player->sc_id << 8), 0x3E8);
+            }
+            player->routine_1 = 0;
+            player->routine_2 = 0;
+            player->routine_3 = 0;
+            return;
+        }
         }
     }
 
@@ -1013,7 +1192,7 @@ namespace openre::player
                 }
                 if (key_trg & input::KEY_TYPE_128)
                 {
-                    set_flag(FlagGroup::Status, FG_STATUS_10, true);
+                    set_flag(FlagGroup::Status, FG_STATUS_INTERACT, true);
                 }
             }
             if (key & input::KEY_TYPE_AIM && player->type & 0xFFF)
@@ -1052,10 +1231,12 @@ namespace openre::player
         br_tbl[2] = pl_br_run_forward;
         br_tbl[3] = pl_br_backward;
         br_tbl[4] = pl_br_rotate;
+        br_tbl[9] = pl_br_step_down;
         br_tbl[10] = pl_br_push_object;
         br_tbl[12] = pl_br_quickturn;
         // set mv hooks
         mv_tbl[6] = pl_mv_pick_up_item;
+        mv_tbl[9] = pl_mv_step_down;
         mv_tbl[10] = pl_mv_push_object;
         mv_tbl[12] = pl_mv_quickturn;
         // replace old table pointers
@@ -1084,8 +1265,6 @@ namespace openre::player
         interop::writeJmp(0x00502190, &partner_switch);
         interop::writeJmp(0x00502660, &inventory_find_item);
         interop::writeJmp(0x4FC3CE, itembox_prev_slot);
-        interop::writeJmp(0x5024D0, set_inventory_item);
-        interop::writeJmp(0x502500, set_inventory_item_quantity);
         interop::writeJmp(0x4D97B0, player_move);
         interop::writeJmp(0x4D9D20, pl_move);
         interop::writeJmp(0x4DC130, pl_mv_damage);

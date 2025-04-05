@@ -17,7 +17,7 @@
 #include "scd.h"
 #include "sce.h"
 #include "title.h"
-#include <cassert>
+
 #include <cstring>
 #include <windows.h>
 
@@ -152,7 +152,7 @@ namespace openre
     }
 
     // 0x004427E0
-    static void update_timer()
+    void update_timer()
     {
         auto time = timeGetTime();
         _timerCurrent = time;
