@@ -325,7 +325,6 @@ namespace openre
         bitarray_set(addr, index, value);
     }
 
-
     // 0x004DEF00
     void set_stage()
     {
@@ -354,6 +353,15 @@ namespace openre
     int set_game_seconds(int a0)
     {
         return interop::call<int, int>(0x004428F0, a0);
+    }
+
+    // 0x0050C800
+    void sprintf(char* buffer, const char* format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        interop::call<void, char*, const char*, va_list>(0x0050C800, buffer, format, args);
+        va_end(args);
     }
 }
 

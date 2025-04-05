@@ -568,7 +568,12 @@ static_assert(sizeof(EnemyInitEntry) == 0x04);
 struct InputDevice
 {
     uint32_t raw_state;                 // 0x0000
-    uint8_t pad_0004[464];              // 0x0004
+    uint32_t var_04;                    // 0x0004
+    uint32_t var_08;                    // 0x0008
+    uint8_t pad_000C[40];               // 0x000C
+    uint8_t joycapsa[404];              // 0x0034
+    uint32_t var_1C8;                   // 0x01C8
+    uint8_t pad_01CC[8];                // 0x01CC
     uint32_t enabled;                   // 0x01D4
 };
 static_assert(sizeof(InputDevice) == 0x1D8);
@@ -605,7 +610,9 @@ static_assert(sizeof(DemoPlayer) == 0x746);
 
 struct GameTable
 {
-    uint8_t pad_0000[5394102];          // 0x0000
+    uint8_t pad_0000[5370256];          // 0x0000
+    char* aIIIdDSNDD;                   // 0x51F190
+    uint8_t pad_51F194[23842];          // 0x51F194
     bool enable_dsound;                 // 0x524EB6
     uint8_t pad_524EB7[4261];           // 0x524EB7
     Mat16 door_ll;                      // 0x525F5C

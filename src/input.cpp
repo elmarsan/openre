@@ -3,6 +3,11 @@
 #include "marni.h"
 #include "openre.h"
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+// Prevent Visual Studio from reordering joystickapi.h needs windows.h first.
+#include <joystickapi.h>
+
 #include <cstdint>
 
 using namespace openre::interop;
@@ -164,11 +169,43 @@ namespace openre::input
         return v1;
     }
 
+    // 0x004102E0
+    static void input_init(Input* input)
+    {
+        input->num_devices = 1 + joyGetNumDevs();
+        std::memset(&input->keyboard, 0, sizeof(InputDevice) * 32);
+        // At least one gamepad connected
+        if (input->num_devices > 1)
+        {
+            auto joycapsa = reinterpret_cast<JOYCAPSA*>(&input->gamepad.joycapsa);
+            JOYINFOEX joyInfo;
+
+            joyGetDevCapsA(0, joycapsa, sizeof(JOYCAPSA));
+            input->gamepad.raw_state = 0x34;
+            input->gamepad.var_04 = 0xFF;
+            if (joyGetPosEx(0, &joyInfo) == JOYERR_NOERROR)
+            {
+                char buffer[1024];
+                sprintf(buffer, gGameTable.aIIIdDSNDD, 0, joycapsa->szPname, joycapsa->wNumButtons, joycapsa->wMaxAxes);
+                marni::out();
+            }
+            else
+            {
+                input->gamepad.var_1C8 = 0;
+            }
+        }
+        else
+        {
+            marni::out();
+        }
+    }
+
     void input_init_hooks()
     {
         writeJmp(0x00410450, &on_key_up);
         writeJmp(0x00410410, &on_read_key);
         writeJmp(0x00410400, &input_get_some_byte);
         writeJmp(0x0043BB00, &sub_43BB00);
+        hookThisCall(0x004102E0, &input_init);
     }
 };

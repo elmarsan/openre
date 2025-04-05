@@ -450,6 +450,10 @@ declare     enabled                 u16
 
 struct      InputDevice
 declare     raw_state               u32
+declare     var_04                  u32
+declare     var_08                  u32
+declare     joycapsa                u8[404]                 0x34
+declare     var_1C8                 u32                     0x1C8
 declare     enabled                 u32                     0x1D4
 
 struct      Input
@@ -477,6 +481,7 @@ declare     cdir_y                  s16
 declare     input                   u16[900]
 
 struct      GameTable
+declare     aIIIdDSNDD              char*                   0x0051F190
 declare     enable_dsound           bool                    0x00524EB6
 declare     door_ll                 Mat16                   0x00525F5C
 declare     door_lc                 Mat16                   0x00525F7C
