@@ -187,6 +187,7 @@ namespace openre::input
 
             joyGetDevCapsA(0, joycapsa, sizeof(JOYCAPSA));
             std::memset(&input->gamepad, 0, 0x34);
+            input->gamepad.var_1C8 = 0;
             input->gamepad.raw_state = 0x34;
             input->gamepad.var_04 = 0xFF;
             if (joyGetPosEx(0, &joyInfo) == JOYERR_NOERROR)
@@ -212,6 +213,6 @@ namespace openre::input
         writeJmp(0x00410410, &on_read_key);
         writeJmp(0x00410400, &input_get_some_byte);
         writeJmp(0x0043BB00, &sub_43BB00);
-        hookThisCall(0x004102E0, &input_init);
+        // hookThisCall(0x004102E0, &input_init);
     }
 };
