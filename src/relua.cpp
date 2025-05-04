@@ -11,6 +11,11 @@
 #include <string_view>
 #include <tuple>
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 namespace fs = std::filesystem;
 
 using namespace openre::modding;
@@ -127,6 +132,7 @@ namespace openre::lua
             setGlobal("re.getFlag", apiGetFlag);
             setGlobal("re.setFlag", apiSetFlag);
             setGlobal("re.getEntity", apiGetEntity);
+            setGlobal("re.getInputState", apiGetInputState);
 
             setGlobal("HookKind.tick", static_cast<int32_t>(HookKind::tick));
 
@@ -304,6 +310,15 @@ namespace openre::lua
             luaL_getmetatable(L, METATABLE_ENTITY);
             lua_setmetatable(L, -2);
             return 1;
+        }
+
+        static int apiGetInputState(lua_State* L)
+        {
+            bool oIsDown = (GetKeyState('O') >> 15) & 1;
+            bool pIsDown = (GetKeyState('P') >> 15) & 1;
+            lua_pushboolean(L, oIsDown);
+            lua_pushboolean(L, pIsDown);
+            return 2;
         }
 
         static int entity_get(lua_State* L)
