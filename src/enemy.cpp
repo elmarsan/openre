@@ -241,12 +241,6 @@ namespace openre::enemy
         return interop::call<void, int>(0x00442F50, id);
     }
 
-    // 0x00443F70
-    static void pl_load_texture(int workNo, void* pTim, int tpage, int clut, int id)
-    {
-        return interop::call<void, int, void*, int, int, int>(0x00443F70, workNo, pTim, tpage, clut, id);
-    }
-
     static int get_customised_emd_id(int id)
     {
         if (id >= EM_LEON_RPD && id <= EM_LEON_LEATHER)

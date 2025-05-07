@@ -15,4 +15,5 @@ namespace openre
     int omd_in_check(Vec32* vec, ObjectEntity* object, int a2, int a3);
     void add_speed_xz(Entity* entity, int16_t d);
     void rbj_set();
+    void pl_load_texture(int workNo, void* pTim, int tpage, int clut, int id);
 }

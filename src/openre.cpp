@@ -725,6 +725,12 @@ namespace openre
     {
         return interop::call<int, int>(0x004428F0, a0);
     }
+
+    // 0x00442EA0
+    void set_registry_flag(int a0, int a1)
+    {
+        interop::call<void, int, int>(0x00442EA0, a0, a1);
+    }
 }
 
 static void load_init_table(void* tempBuffer, uint8_t index)

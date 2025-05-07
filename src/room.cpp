@@ -30,12 +30,6 @@ namespace openre::room
     static const char* font1 = "common\\data\\font1.tim";
     static const char* font2 = "common\\data\\font1.adt";
 
-    // 0x00442EA0
-    static void set_registry_flag(int a0, int a1)
-    {
-        interop::call<void, int, int>(0x00442EA0, a0, a1);
-    }
-
     // 0x004450C0
     static void sub_4450C0(int a0)
     {

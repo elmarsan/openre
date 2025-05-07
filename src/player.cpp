@@ -2,9 +2,11 @@
 #include "audio.h"
 #include "enemy.h"
 #include "entity.h"
+#include "file.h"
 #include "input.h"
 #include "interop.hpp"
 #include "item.h"
+#include "marni.h"
 #include "openre.h"
 #include "re2.h"
 #include "scd.h"
@@ -16,6 +18,7 @@ using namespace openre::audio;
 using namespace openre::sce;
 using namespace openre::enemy;
 using namespace openre::input;
+using namespace openre::file;
 
 namespace openre::player
 {
@@ -1603,7 +1606,46 @@ namespace openre::player
     // 0x004D93A0
     void player_set(PlayerEntity* player)
     {
-        interop::call<void, PlayerEntity*>(0x004D93A0, player);
+        static void*& dword_6B1920 = *((void**)0x006B1920);
+
+        switch (player->id)
+        {
+        case PLD_HUNK: set_registry_flag(4, 3); break;
+        case PLD_TOFU: set_registry_flag(4, 4); break;
+        case PLD_ADA: set_registry_flag(4, 5); break;
+        }
+
+        const char* pldFilepath = "pl0\pld\pl00.pld";
+        // pldFilepath[11] = player->id + 48;
+
+        if (player->id > PLD_CLAIRE_4)
+        {
+            // pldFilepath[11] = player->id + 87;
+        }
+        if (check_flag(FlagGroup::Status, FG_STATUS_PLAYER))
+        {
+            // pldFilepath[2] = '1';
+        }
+
+        if (read_file_into_buffer(pldFilepath, &gGameTable.pld_buffer, 8))
+        {
+            // TODO: Fix it
+            auto textureOffset = gGameTable.pld_buffer;
+
+            player->clut = 1;
+            // player->pKan_t_ptr = v3;
+            player->tpage = 23;
+            // player->tmd =
+
+            gGameTable.word_989EE8 = 279;
+            marni::out();
+            pl_load_texture(player->work_no, textureOffset, 23, 1, player->id);
+            // Fix
+            std::memcpy(dword_6B1920, &gGameTable.pld_buffer, 2);
+            
+        }
+
+        // interop::call<void, PlayerEntity*>(0x004D93A0, player);
     }
 
     void player_init_hooks()

@@ -75,4 +75,10 @@ namespace openre
     {
         interop::call(0x004B4480);
     }
+
+    // 0x00443F70
+    void pl_load_texture(int workNo, void* pTim, int tpage, int clut, int id)
+    {
+        return interop::call<void, int, void*, int, int, int>(0x00443F70, workNo, pTim, tpage, clut, id);
+    }
 }
