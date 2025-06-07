@@ -40,7 +40,6 @@ namespace openre::marni
     static void __stdcall do_render(Marni* self, MarniOt* pOt);
     static int __stdcall init_all(Marni* self);
     static int __stdcall clear_buffers(Marni* self);
-    static void __stdcall flip(Marni* self);
     static void __stdcall move(Marni* marni);
     static int __stdcall movie_open(
         MarniMovie* self, LPCSTR path, HWND hWnd, LPRECT pRect, LPDIRECTDRAW2 pDD2, LPDIRECTDRAWSURFACE pSurface);

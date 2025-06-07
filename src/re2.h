@@ -1183,7 +1183,7 @@ struct GameTable
     uint32_t dword_67CA1C;              // 0x67CA1C
     uint8_t pad_67CA20[16];             // 0x67CA20
     Input input;                        // 0x67CA30
-    uint8_t pad_68055C[4];              // 0x68055C
+    uint32_t timer_10;                  // 0x68055C
     MarniFont marni_font;               // 0x680560
     void* hwnd;                         // 0x68056C
     uint32_t timer_current;             // 0x680570
@@ -1192,11 +1192,11 @@ struct GameTable
     uint8_t pad_68057C[4];              // 0x68057C
     uint32_t error_no;                  // 0x680580
     uint8_t vsync_rate;                 // 0x680584
-    uint8_t pad_680585[1];              // 0x680585
+    uint8_t timer_r1;                   // 0x680585
     uint8_t timer_r2;                   // 0x680586
     uint8_t timer_frame;                // 0x680587
     uint32_t game_seconds;              // 0x680588
-    uint8_t pad_68058C[1];              // 0x68058C
+    uint8_t frame_current;              // 0x68058C
     uint8_t can_draw;                   // 0x68058D
     uint8_t movie_r0;                   // 0x68058E
     uint8_t reset_r0;                   // 0x68058F
@@ -1204,7 +1204,8 @@ struct GameTable
     uint8_t byte_680591;                // 0x680591
     uint8_t byte_680592;                // 0x680592
     uint8_t byte_680593;                // 0x680593
-    uint8_t pad_680594[4];              // 0x680594
+    uint8_t pad_680594[3];              // 0x680594
+    uint8_t byte_680597;                // 0x680597
     uint8_t byte_680598;                // 0x680598
     uint8_t ushinabe;                   // 0x680599
     uint8_t blood_censor;               // 0x68059A

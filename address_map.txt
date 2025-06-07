@@ -913,15 +913,18 @@ declare     dword_67CA14            u32                     0x0067CA14
 declare     dword_67CA18            u32                     0x0067CA18
 declare     dword_67CA1C            u32                     0x0067CA1C
 declare     input                   Input                   0x0067CA30
+declare     timer_10                u32                     0x0068055C
 declare     marni_font              MarniFont               0x00680560
 declare     hwnd                    void*                   0x0068056C
 declare     timer_current           u32                     0x00680570
 declare     hInstance               void*                   0x00680578
 declare     error_no                u32                     0x00680580
 declare     vsync_rate              u8                      0x00680584
+declare     timer_r1                u8                      0x00680585
 declare     timer_r2                u8                      0x00680586
 declare     timer_frame             u8                      0x00680587
 declare     game_seconds            u32                     0x00680588
+declare     frame_current           u8                      0x0068058C
 declare     can_draw                u8                      0x0068058D
 declare     movie_r0                u8                      0x0068058E
 declare     reset_r0                u8                      0x0068058F
@@ -929,6 +932,7 @@ declare     byte_680590             u8                      0x00680590
 declare     byte_680591             u8                      0x00680591
 declare     byte_680592             u8                      0x00680592
 declare     byte_680593             u8                      0x00680593
+declare     byte_680597             u8                      0x00680597
 declare     byte_680598             u8                      0x00680598
 declare     ushinabe                u8                      0x00680599
 declare     blood_censor            u8                      0x0068059A
