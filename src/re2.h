@@ -708,6 +708,22 @@ struct PrimSprite : Prim
 };
 static_assert(sizeof(PrimSprite) == 0x1C);
 
+struct PrimScaler : Prim
+{
+    uint32_t prj;                       // 0x0008
+    uint32_t rgb0;                      // 0x000C
+    uint32_t rgb1;                      // 0x0010
+    uint32_t c_x;                       // 0x0014
+    uint32_t c_y;                       // 0x0018
+    float rate_x;                       // 0x001C
+    float rate_y;                       // 0x0020
+    uint32_t var_24;                    // 0x0024
+    uint32_t var_28;                    // 0x0028
+    uint32_t var_2C;                    // 0x002C
+    uint32_t var_30;                    // 0x0030
+};
+static_assert(sizeof(PrimScaler) == 0x34);
+
 struct MarniFont
 {
     uint32_t bitmap;                    // 0x0000
@@ -1172,16 +1188,7 @@ struct GameTable
     uint32_t timer_last;                // 0x67C9F4
     uint8_t vk_press;                   // 0x67C9F8
     uint8_t pad_67C9F9[3];              // 0x67C9F9
-    Prim* scaler;                       // 0x67C9FC
-    uint32_t dword_67CA00;              // 0x67CA00
-    uint32_t dword_67CA04;              // 0x67CA04
-    uint32_t dword_67CA08;              // 0x67CA08
-    uint8_t pad_67CA0C[4];              // 0x67CA0C
-    uint32_t dword_67CA10;              // 0x67CA10
-    uint32_t dword_67CA14;              // 0x67CA14
-    uint32_t dword_67CA18;              // 0x67CA18
-    uint32_t dword_67CA1C;              // 0x67CA1C
-    uint8_t pad_67CA20[16];             // 0x67CA20
+    PrimScaler scaler;                  // 0x67C9FC
     Input input;                        // 0x67CA30
     uint32_t timer_10;                  // 0x68055C
     MarniFont marni_font;               // 0x680560

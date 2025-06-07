@@ -1247,7 +1247,7 @@ namespace openre
         if (gGameTable.hMutex)
         {
             gGameTable.error_no = 18;
-            // goto LABEL_84
+            goto LABEL_84;
         }
         gGameTable.hMutex = CreateMutexA(0, 0, mutexName);
 
@@ -1272,11 +1272,13 @@ namespace openre
 
             ImmAssociateContext(window, NULL);
             auto marniPtr = (Marni*)operator_new(sizeof(Marni));
-            if (marniPtr)
-            {
-                gGameTable.pMarni = marni::init(marniPtr, window, 320, 240);
-            }
-            if (!gGameTable.pMarni->is_gpu_active)
+            gGameTable.pMarni = marni::init(marniPtr, window, 320, 240);
+            ASSERT(gGameTable.pMarni);
+            // if (marniPtr)
+            // {
+            //     pMarni = marni::init(marniPtr, window, 320, 240);
+            // }
+            if (!gGameTable.pMarni->is_gpu_active || !marni::request_display_mode_count(gGameTable.pMarni))
             {
                 gGameTable.error_no = 13;
                 DestroyWindow(window);
@@ -1295,39 +1297,70 @@ namespace openre
             }
             update_timer();
 
-            gGameTable.timer_r2 = 0;
-
-            while (true)
+        RESET_TIMER:
+            gGameTable.timer_r0 = 0;
+            while (1)
             {
-                gGameTable.timer_r0 = 0;
-
-                MSG msg;
-                while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE))
+                while (1)
                 {
-                    if (msg.message == WM_QUIT)
+                    MSG msg;
+                    while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE))
                     {
-                        break;
+                        if (msg.message == WM_QUIT)
+                        {
+                            goto LABEL_81;
+                            // break;
+                        }
+
+                        TranslateMessage(&msg);
+                        DispatchMessageA(&msg);
                     }
+                    if (gGameTable.error_no > 9)
+                    {
+                        ASSERT(0);
+                        DestroyWindow((HWND)gGameTable.hwnd);
+                        gGameTable.hwnd = 0;
+                    }
+                    // do
+                    //{
+                    //     while (1)
+                    //     {
+                    //         do
+                    //         {
+                    //             MSG msg;
+                    //             while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE))
+                    //             {
+                    //                 if (msg.message == WM_QUIT)
+                    //                 {
+                    //                     goto LABEL_81;
+                    //                     // break;
+                    //                 }
 
-                    TranslateMessage(&msg);
-                    DispatchMessageA(&msg);
-                }
+                    //                TranslateMessage(&msg);
+                    //                DispatchMessageA(&msg);
+                    //            }
+                    //        } while (!gGameTable.hwnd);
 
-                ////////////////////////////////////
-                // Capping frame rate ???
+                    //        if (gGameTable.error_no <= 9)
+                    //        {
+                    //            break;
+                    //        }
+                    //        DestroyWindow((HWND)gGameTable.hwnd);
+                    //        gGameTable.hwnd = 0;
+                    //    }
+                    //} while (!gGameTable.exit_game || !gGameTable.pMarni);
 
-                auto currentFrameTime = 0;
-                while (true)
-                {
                     lpCmdLine = (LPSTR)0x1040201;
 
-                    if (!gGameTable.timer_r0)
+                    ////////////////////////////////////
+                    // Capping frame rate ???
+                    if (gGameTable.timer_r0 == 0)
                     {
                         break;
                     }
-                    if (!gGameTable.timer_r0 == 1)
+                    if (gGameTable.timer_r0 == 1)
                     {
-                        currentFrameTime = gGameTable.timer_current;
+                        v10 = gGameTable.timer_current;
                         goto LABEL_64;
                     }
 
@@ -1340,13 +1373,12 @@ namespace openre
                             gGameTable.timer_r0 = 1;
                         }
                     }
+                    ////////////////////////////////////
                 }
-                ////////////////////////////////////
 
                 if (gGameTable.movie_r0)
                 {
-                    // break;
-                    // continue ??
+                    break;
                 }
                 if (gGameTable.reset_r0)
                 {
@@ -1355,7 +1387,7 @@ namespace openre
                     gGameTable.pMarni->gpu_flag |= marni::GpuFlags::GPU_3;
                     reset_screen();
                     marni::clear(gGameTable.pMarni);
-                    // @@loop_flip:
+                LOOP_FLIP:
                     marni::draw(gGameTable.pMarni);
                     marni::flip(gGameTable.pMarni);
                 }
@@ -1364,12 +1396,12 @@ namespace openre
                     marni::clear_otags(gGameTable.pMarni);
                     reset_geom();
                     gGameTable.byte_6805B4 = 0;
-                    gGameTable.pMarni->gpu_flag &= marni::GpuFlags::GPU_3;
+                    gGameTable.pMarni->gpu_flag &= ~marni::GpuFlags::GPU_3;
                     gGameTable.timer_r2 = 0;
                     save_reset();
                     if (gGameTable.byte_680597 & 1)
                     {
-                        gGameTable.byte_680597 |= 2u;
+                        gGameTable.byte_680597 |= 2;
                     }
                     psx_main();
                     if (++gGameTable.timer_frame > 100)
@@ -1393,10 +1425,10 @@ namespace openre
                     }
 
                     winTime = timeGetTime();
+                    v10 = winTime;
                     gGameTable.timer_current = winTime;
                     elapsed = 10 * (winTime - gGameTable.timer_last);
                     targetFrameRate = frameRateTable[gGameTable.vsync_rate / 2];
-                    v10 = winTime;
 
                     if (elapsed >= targetFrameRate)
                     {
@@ -1407,7 +1439,7 @@ namespace openre
 
                     LABEL_54:
                         gGameTable.timer_r1 = 0;
-                        if (gGameTable.vsync_rate || gGameTable.timer_frame >= 30)
+                        if (gGameTable.vsync_rate || gGameTable.timer_frame >= 15)
                         {
                             if (gGameTable.timer_10 + 10000 < 10 * v10)
                             {
@@ -1419,14 +1451,14 @@ namespace openre
                         if (10 * v10 > gGameTable.timer_10)
                         {
                             gGameTable.timer_r1 = 1;
-                            // goto @@reset_timer;
+                            goto RESET_TIMER;
                         }
                     }
                 }
 
             LABEL_64:
                 gGameTable.timer_frame = 0;
-                gGameTable.timer_last = currentFrameTime;
+                gGameTable.timer_last = v10;
                 make_font();
                 if (gGameTable.pMarni)
                 {
@@ -1451,22 +1483,22 @@ namespace openre
                         else
                         {
                             marni::set_gpu_flag();
-                            gGameTable.dword_67CA00 = 15872;
+                            gGameTable.scaler.type = 15872;
                             if (gGameTable.pMarni->xsize == 640)
                             {
-                                gGameTable.dword_67CA1C = 0x40000000;
-                                gGameTable.dword_67CA18 = 0x40000000;
+                                gGameTable.scaler.rate_x = 2.0f;
+                                gGameTable.scaler.rate_y = 2.0f;
                             }
                             else
                             {
-                                gGameTable.dword_67CA1C = 0x3F800000;
-                                gGameTable.dword_67CA18 = 0x3F800000;
+                                gGameTable.scaler.rate_x = 1.0f;
+                                gGameTable.scaler.rate_y = 1.0f;
                             }
-                            gGameTable.dword_67CA04 = gGameTable.global_prj;
-                            gGameTable.dword_67CA08 = gGameTable.global_rgb;
-                            gGameTable.dword_67CA10 = gGameTable.global_cx + 160;
-                            gGameTable.dword_67CA14 = gGameTable.global_cy + 120;
-                            //   marni::add_primitive_scaler(gGameTable.pMarni, gGameTable.scaler, 4095);
+                            gGameTable.scaler.prj = gGameTable.global_prj;
+                            gGameTable.scaler.rgb0 = gGameTable.global_rgb;
+                            gGameTable.scaler.c_x = gGameTable.global_cx + 160;
+                            gGameTable.scaler.c_y = gGameTable.global_cy + 120;
+                            marni::add_primitive_scaler(gGameTable.pMarni, &gGameTable.scaler, 4095);
                         }
 
                         marni::clear(gGameTable.pMarni);
@@ -1487,8 +1519,10 @@ namespace openre
                         marni::font_trans(&gGameTable.marni_font, &gGameTable.pMarni->surface0);
                         marni::flip(gGameTable.pMarni);
 
-                        // goto reset_timer
+                        goto RESET_TIMER;
                     }
+
+                    gGameTable.timer_r0 = 2;
                 }
             }
 
@@ -1499,11 +1533,10 @@ namespace openre
             marni::clear(gGameTable.pMarni);
             marni::marni_movie_update(gGameTable.pMarni);
 
-            // goto @@loop_flip;
-            marni::draw(gGameTable.pMarni);
-            marni::flip(gGameTable.pMarni);
+            goto LOOP_FLIP;
         }
 
+    LABEL_81:
         marni::kill();
         config_write();
         if (gGameTable.byte_680592 == 1)
@@ -1512,8 +1545,9 @@ namespace openre
             ShowCursor(true);
         }
         // TODO
-        SystemParametersInfoA(0x11, gGameTable.byte_680592, 0, 2);
+        SystemParametersInfoA(SPI_SETSCREENSAVEACTIVE, gGameTable.byte_680592, 0, 2);
 
+    LABEL_84:
         switch (gGameTable.error_no)
         {
         case 0: [[fallthrough]];
@@ -1596,7 +1630,8 @@ void onAttach()
 }
 
 extern "C" {
-__declspec(dllexport) BOOL /* WINAPI */ openre_main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+__declspec(dllexport) BOOL /* WINAPI */
+openre_main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     return 0;
 }

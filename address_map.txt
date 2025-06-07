@@ -558,6 +558,20 @@ declare     v0                      u8
 declare     u1                      u8
 declare     v1                      u8
 
+struct      PrimScaler
+base        Prim
+declare     prj                     u32
+declare     rgb0                    u32
+declare     rgb1                    u32
+declare     c_x                     u32
+declare     c_y                     u32
+declare     rate_x                  f32
+declare     rate_y                  f32
+declare     var_24                  u32
+declare     var_28                  u32
+declare     var_2C                  u32
+declare     var_30                  u32
+
 struct      MarniFont
 declare     bitmap                  u32
 declare     width                   u32
@@ -904,14 +918,7 @@ declare     file_buffer             void*                   0x0067C9D0
 declare     timer_r0                u8                      0x0067C9E4
 declare     timer_last              u32                     0x0067C9F4
 declare     vk_press                u8                      0x0067C9F8
-declare     scaler                  Prim*                   0x0067C9FC
-declare     dword_67CA00            u32                     0x0067CA00
-declare     dword_67CA04            u32                     0x0067CA04
-declare     dword_67CA08            u32                     0x0067CA08
-declare     dword_67CA10            u32                     0x0067CA10
-declare     dword_67CA14            u32                     0x0067CA14
-declare     dword_67CA18            u32                     0x0067CA18
-declare     dword_67CA1C            u32                     0x0067CA1C
+declare     scaler                  PrimScaler              0x0067C9FC
 declare     input                   Input                   0x0067CA30
 declare     timer_10                u32                     0x0068055C
 declare     marni_font              MarniFont               0x00680560

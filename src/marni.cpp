@@ -339,7 +339,7 @@ namespace openre::marni
     }
 
     // 0x00402530
-    static int __stdcall request_display_mode_count(Marni* self)
+    int __stdcall request_display_mode_count(Marni* self)
     {
         if (self->is_gpu_active)
             return self->res_count;
